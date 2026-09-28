@@ -35,10 +35,10 @@ export interface GorillaMotion {
 }
 
 const MATERIAL_COLORS: Record<MaterialName, string> = {
-  fur: '#292724',
-  face: '#302a27',
-  shadow: '#0c0a09',
-  iris: '#684b2d',
+  fur: '#393936',
+  face: '#38312d',
+  shadow: '#100d0b',
+  iris: '#60452a',
   pupil: '#090807',
   glint: '#d8cbb5',
 };
@@ -128,7 +128,7 @@ function createMaterials(): Record<MaterialName, THREE.MeshStandardMaterial> {
     vertexColors: true,
     map: furTexture,
     bumpMap: furTexture,
-    bumpScale: 0.012,
+    bumpScale: 0.022,
   });
 
   fur.onBeforeCompile = (shader) => {
@@ -153,7 +153,7 @@ function createMaterials(): Record<MaterialName, THREE.MeshStandardMaterial> {
        float furNoise = sin(vGorillaFurPosition.x * 71.0
          + vGorillaFurPosition.y * 53.0
          + vGorillaFurPosition.z * 97.0);
-       diffuseColor.rgb *= 0.965 + furWave * 0.018 + furNoise * 0.012;`,
+        diffuseColor.rgb *= 1.0 + furWave * 0.022 + furNoise * 0.018;`,
     );
   };
   fur.customProgramCacheKey = () => 'catus-gorilla-fur-detail-v2';
@@ -215,7 +215,7 @@ function makeEllipsoid(
   const [radiusX, radiusY, radiusZ] = part.radius;
   const colors: number[] = [];
   const baseColor = new THREE.Color(part.color ?? MATERIAL_COLORS[part.material]);
-  const saddleColor = new THREE.Color('#747f89');
+      const saddleColor = new THREE.Color('#626a72');
   const sourcePositions = geometry.getAttribute('position');
 
   for (let index = 0; index < sourcePositions.count; index += 1) {
@@ -227,10 +227,10 @@ function makeEllipsoid(
     if (part.saddle) {
       const back = smoothstep(0.12, 0.7, -z);
       const upper = smoothstep(0.04, 0.45, y);
-      localColor.lerp(saddleColor, back * upper * 0.88);
+      localColor.lerp(saddleColor, back * upper * 0.82);
     }
 
-    const grain = Math.sin(x * 13.7 + y * 18.3 + z * 11.9) * 0.025;
+    const grain = Math.sin(x * 13.7 + y * 18.3 + z * 11.9) * 0.045;
     localColor.multiplyScalar(0.97 + grain);
     colors.push(localColor.r, localColor.g, localColor.b);
   }
@@ -513,22 +513,11 @@ export function createGorillaRig(options: { softwareFallback?: boolean } = {}): 
   return { root, bones, fingerBones };
 }
 
-function gesturePulse(time: number, start: number, end: number) {
-  const progress = (time - start) / (end - start);
-  if (progress <= 0 || progress >= 1) return 0;
-  const eased = progress * progress * (3 - 2 * progress);
-  return Math.sin(Math.PI * eased);
-}
-
 export function animateGorillaRig(rig: GorillaRig, motion: GorillaMotion) {
-  const { timeSeconds, pointerX, pointerY, scrollProgress } = motion;
+  const { timeSeconds, pointerX, pointerY, seatAmount } = motion;
   const time = Math.max(0, timeSeconds);
-  const breath = 0.5 + 0.5 * Math.sin((time * Math.PI * 2) / 4.8 - Math.PI / 2);
-  const cycleLength = 12.4;
-  const cycleTime = (time + 1.8) % cycleLength;
-  const action = gesturePulse(cycleTime, 6.2, 10.1);
-  const actionSide = Math.floor((time + 1.8) / cycleLength) % 2 === 0 ? 1 : -1;
-  const weightShift = Math.sin(time * 0.31) * 0.025 + action * actionSide * 0.045;
+  const seat = THREE.MathUtils.clamp(seatAmount, 0, 1);
+  const breath = 0.5 + 0.5 * Math.sin((time * Math.PI * 2) / 4.6);
   const getBone = (name: string) => rig.bones.get(name);
   const pelvis = getBone('pelvis');
   const spine = getBone('spine');
@@ -537,39 +526,41 @@ export function animateGorillaRig(rig: GorillaRig, motion: GorillaMotion) {
   const head = getBone('head');
   const jaw = getBone('jaw');
 
-  rig.root.rotation.y = pointerX * 0.16 + scrollProgress * 0.19;
-  rig.root.rotation.z = pointerX * -0.018 + weightShift * 0.12;
-  rig.root.position.y = Math.sin(time * 0.72) * 0.008 + scrollProgress * 0.035;
+  rig.root.rotation.y = pointerX * 0.26;
+  rig.root.rotation.x = -pointerY * 0.025;
+  rig.root.rotation.z = pointerX * -0.014;
+  rig.root.position.y = seat * 0.04;
 
   if (pelvis) {
-    pelvis.rotation.z = weightShift * 0.42;
-    pelvis.rotation.y = Math.sin(time * 0.2) * 0.012;
+    pelvis.position.y = 1.34 - seat * 0.2;
+    pelvis.rotation.x = seat * 0.025;
+    pelvis.rotation.z = pointerX * -0.012;
   }
   if (spine) {
-    spine.scale.set(1 + breath * 0.01, 1, 1 + breath * 0.028);
-    spine.rotation.z = -weightShift * 0.3;
+    spine.scale.set(1 + breath * 0.006, 1, 1 + breath * 0.022);
+    spine.rotation.x = seat * 0.045;
   }
   if (chest) {
     chest.scale.set(
-      1 + breath * 0.034,
-      1 + breath * 0.014,
-      1 + breath * 0.058,
+      1 + breath * 0.022,
+      1 + breath * 0.01,
+      1 + breath * 0.042,
     );
-    chest.rotation.x = 0.06 + Math.sin(time * 0.28) * 0.012 + breath * 0.022;
-    chest.rotation.z = -weightShift * 0.48;
-    chest.rotation.y = pointerX * 0.08 + Math.sin(time * 0.17) * 0.012;
+    chest.rotation.x = 0.035 + seat * 0.09 + breath * 0.016;
+    chest.rotation.y = pointerX * 0.075;
+    chest.rotation.z = pointerX * -0.012;
   }
   if (neck) {
-    neck.rotation.x = -0.045 + pointerY * 0.075 - breath * 0.009;
-    neck.rotation.y = pointerX * 0.2 + action * actionSide * 0.045;
-    neck.rotation.z = Math.sin(time * 0.2) * 0.012;
+    neck.rotation.x = -0.035 + pointerY * 0.09 - seat * 0.035 - breath * 0.008;
+    neck.rotation.y = pointerX * 0.18;
+    neck.rotation.z = pointerX * -0.012;
   }
   if (head) {
-    head.rotation.x = pointerY * 0.13 + Math.sin(time * 0.44) * 0.012 + action * 0.035;
-    head.rotation.y = pointerX * 0.34 + action * actionSide * 0.19 + Math.sin(time * 0.21) * 0.035;
-    head.rotation.z = Math.sin(time * 0.33) * 0.018 + weightShift * 0.16;
+    head.rotation.x = pointerY * 0.15 - seat * 0.025 + breath * 0.004;
+    head.rotation.y = pointerX * 0.34;
+    head.rotation.z = pointerX * -0.018;
   }
-  if (jaw) jaw.rotation.x = Math.sin(time * 0.52) * 0.006 + breath * 0.005;
+  if (jaw) jaw.rotation.x = breath * 0.003;
 
   for (const side of [-1, 1]) {
     const suffix = side < 0 ? 'L' : 'R';
@@ -581,44 +572,44 @@ export function animateGorillaRig(rig: GorillaRig, motion: GorillaMotion) {
     const thigh = getBone(`thigh_${suffix}`);
     const shin = getBone(`shin_${suffix}`);
     const foot = getBone(`foot_${suffix}`);
-    const phase = side < 0 ? 0 : Math.PI;
-
     if (shoulder) {
-      shoulder.rotation.z = side * (breath * 0.032 + Math.sin(time * 0.56 + phase) * 0.01);
-      shoulder.rotation.x = Math.sin(time * 0.31 + phase) * 0.015;
+      shoulder.rotation.z = side * (breath * 0.022 + seat * 0.018);
+      shoulder.rotation.x = seat * 0.08;
     }
     if (upperArm) {
-      upperArm.rotation.x = 0.025 + Math.sin(time * 0.48 + phase) * 0.026 + action * 0.018;
-      upperArm.rotation.z = side * (0.018 + weightShift * 0.28);
+      upperArm.rotation.x = 0.018 + seat * 0.16;
+      upperArm.rotation.z = side * (0.015 + seat * 0.035);
     }
     if (forearm) {
-      forearm.rotation.x = 0.012 + Math.sin(time * 0.62 + phase) * 0.024 + action * 0.028;
-      forearm.rotation.z = side * (0.018 + Math.sin(time * 0.29 + phase) * 0.012);
+      forearm.rotation.x = 0.012 - seat * 0.09;
+      forearm.rotation.z = side * 0.018;
     }
     if (hand) {
-      hand.rotation.x = Math.sin(time * 0.62 + phase) * 0.03 + action * 0.035;
-      hand.rotation.z = side * Math.sin(time * 0.3 + phase) * 0.018;
+      hand.rotation.x = seat * 0.06;
+      hand.rotation.z = side * 0.012;
     }
-    if (hip) hip.rotation.z = side * weightShift * 0.18;
+    if (hip) {
+      hip.rotation.x = -seat * 0.88;
+      hip.rotation.z = side * (0.015 + seat * 0.08);
+    }
     if (thigh) {
-      thigh.rotation.z = side * weightShift * 0.22;
-      thigh.rotation.x = Math.sin(time * 0.3 + phase) * 0.008;
+      thigh.rotation.x = seat * 0.92;
+      thigh.rotation.z = -side * seat * 0.035;
     }
-    if (shin) shin.rotation.z = -side * Math.max(0, weightShift * side) * 0.12;
-    if (foot) foot.rotation.x = Math.sin(time * 0.3 + phase) * 0.008;
+    if (shin) shin.rotation.x = -seat * 0.04;
+    if (foot) foot.rotation.x = seat * 0.04;
 
     const eye = getBone(`eye_${suffix}`);
     if (eye) {
-      eye.rotation.y = pointerX * 0.11 + action * actionSide * 0.035;
-      eye.rotation.x = pointerY * 0.04;
+      eye.rotation.y = pointerX * 0.085;
+      eye.rotation.x = pointerY * 0.035;
     }
   }
 
   rig.fingerBones.forEach(({ name, side, digit, segment }) => {
     const finger = getBone(name);
     if (!finger) return;
-    const phase = time * 0.8 + digit * 0.52 + (side < 0 ? 0 : Math.PI);
-    const curl = 0.055 + action * 0.055 + Math.sin(phase) * 0.018;
+    const curl = 0.045 + breath * 0.012;
     finger.rotation.x = curl * (segment === 0 ? 0.72 : segment === 1 ? 1 : 0.8);
     if (digit === 0) finger.rotation.z = side * (segment === 0 ? -0.14 : -0.08);
   });

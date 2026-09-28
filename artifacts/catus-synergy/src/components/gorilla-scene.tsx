@@ -126,7 +126,7 @@ export function GorillaScene() {
 
     const pointerTarget = new THREE.Vector2();
     const pointerCurrent = new THREE.Vector2();
-    const interaction = { scrollProgress: 0 };
+    const interaction = { seatAmount: 0 };
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const heroSection = host.closest<HTMLElement>('#home');
     let isVisible = true;
@@ -163,11 +163,14 @@ export function GorillaScene() {
     const updateScroll = () => {
       if (!heroSection) return;
       const bounds = heroSection.getBoundingClientRect();
-      interaction.scrollProgress = THREE.MathUtils.clamp(
-        -bounds.top / Math.max(heroSection.offsetHeight, 1),
+      const downwardTravel = Math.max(0, -bounds.top);
+      const sitDistance = Math.max(window.innerHeight * 0.42, 1);
+      interaction.seatAmount = THREE.MathUtils.smoothstep(
+        THREE.MathUtils.clamp(downwardTravel / sitDistance, 0, 1),
         0,
         1,
       );
+      if (reducedMotion.matches) requestRender();
     };
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -176,9 +179,13 @@ export function GorillaScene() {
       if (!bounds.width || !bounds.height) return;
       pointerTarget.x = clampPointer(((event.clientX - bounds.left) / bounds.width) * 2 - 1);
       pointerTarget.y = clampPointer(1 - ((event.clientY - bounds.top) / bounds.height) * 2);
+      if (reducedMotion.matches) requestRender();
     };
 
-    const resetPointer = () => pointerTarget.set(0, 0);
+    const resetPointer = () => {
+      pointerTarget.set(0, 0);
+      if (reducedMotion.matches) requestRender();
+    };
 
     const renderFrame = (now: number) => {
       animationFrame = 0;
@@ -196,12 +203,12 @@ export function GorillaScene() {
       const smoothing = 1 - Math.exp(-delta * 5.5);
 
       if (reducedMotion.matches) {
-        pointerCurrent.set(0, 0);
+        pointerCurrent.copy(pointerTarget);
         animateGorillaRig(gorilla, {
           timeSeconds: 0,
-          pointerX: 0,
-          pointerY: 0,
-          scrollProgress: 0,
+          pointerX: pointerCurrent.x,
+          pointerY: pointerCurrent.y,
+          seatAmount: interaction.seatAmount,
         });
         renderCurrentPose();
         return;
@@ -212,7 +219,7 @@ export function GorillaScene() {
         timeSeconds: elapsed,
         pointerX: pointerCurrent.x,
         pointerY: pointerCurrent.y,
-        scrollProgress: interaction.scrollProgress,
+        seatAmount: interaction.seatAmount,
       });
       renderCurrentPose();
       animationFrame = window.requestAnimationFrame(renderFrame);
@@ -275,7 +282,7 @@ export function GorillaScene() {
         timeSeconds: 0,
         pointerX: 0,
         pointerY: 0,
-        scrollProgress: 0,
+        seatAmount: interaction.seatAmount,
       });
       renderCurrentPose();
     }
