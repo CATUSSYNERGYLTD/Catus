@@ -31,16 +31,16 @@ export interface GorillaMotion {
   timeSeconds: number;
   pointerX: number;
   pointerY: number;
-  scrollProgress: number;
+  seatAmount: number;
 }
 
 const MATERIAL_COLORS: Record<MaterialName, string> = {
-  fur: '#30353a',
-  face: '#3b4248',
-  shadow: '#07090b',
-  iris: '#8b6239',
-  pupil: '#090909',
-  glint: '#f2e4ca',
+  fur: '#292724',
+  face: '#302a27',
+  shadow: '#0c0a09',
+  iris: '#684b2d',
+  pupil: '#090807',
+  glint: '#d8cbb5',
 };
 
 function smoothstep(edge0: number, edge1: number, value: number) {
@@ -48,12 +48,87 @@ function smoothstep(edge0: number, edge1: number, value: number) {
   return t * t * (3 - 2 * t);
 }
 
+function makeFurTexture() {
+  if (typeof document === 'undefined') return undefined;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const context = canvas.getContext('2d');
+  if (!context) return undefined;
+
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  let seed = 721_437;
+  const random = () => {
+    seed = (seed * 1_664_525 + 1_013_904_223) >>> 0;
+    return seed / 4_294_967_296;
+  };
+
+  for (let strand = 0; strand < 125_000; strand += 1) {
+    const x = random() * canvas.width;
+    const y = random() * canvas.height;
+    const length = 2 + random() * 12;
+    const drift = (random() - 0.5) * 0.8;
+    const shade = Math.round(65 + random() * 105);
+    const alpha = 0.08 + random() * 0.28;
+    context.strokeStyle = `rgba(${shade},${shade},${shade},${alpha})`;
+    context.lineWidth = 0.25 + random() * 0.8;
+    context.beginPath();
+    context.moveTo(x, y);
+    context.quadraticCurveTo(x + drift * 2, y + length * 0.5, x + drift, y + length);
+    context.stroke();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.anisotropy = 8;
+  return texture;
+}
+
+function makeFaceTexture() {
+  if (typeof document === 'undefined') return undefined;
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const context = canvas.getContext('2d');
+  if (!context) return undefined;
+
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  let seed = 903_271;
+  const random = () => {
+    seed = (seed * 1_664_525 + 1_013_904_223) >>> 0;
+    return seed / 4_294_967_296;
+  };
+  for (let pore = 0; pore < 18_000; pore += 1) {
+    const shade = Math.round(75 + random() * 135);
+    const alpha = 0.025 + random() * 0.11;
+    context.fillStyle = `rgba(${shade},${shade},${shade},${alpha})`;
+    context.beginPath();
+    context.arc(random() * 512, random() * 512, 0.25 + random() * 1.1, 0, Math.PI * 2);
+    context.fill();
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.anisotropy = 8;
+  return texture;
+}
+
 function createMaterials(): Record<MaterialName, THREE.MeshStandardMaterial> {
+  const furTexture = makeFurTexture();
+  const faceTexture = makeFaceTexture();
   const fur = new THREE.MeshStandardMaterial({
-    color: MATERIAL_COLORS.fur,
-    roughness: 0.92,
-    metalness: 0.015,
+    color: 0xffffff,
+    roughness: 0.96,
+    metalness: 0,
     vertexColors: true,
+    map: furTexture,
+    bumpMap: furTexture,
+    bumpScale: 0.012,
   });
 
   fur.onBeforeCompile = (shader) => {
@@ -72,43 +147,49 @@ function createMaterials(): Record<MaterialName, THREE.MeshStandardMaterial> {
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <color_fragment>',
       `#include <color_fragment>
-       float furGrain = sin(vGorillaFurPosition.x * 171.0
-         + vGorillaFurPosition.y * 113.0
-         + sin(vGorillaFurPosition.z * 89.0) * 2.4);
-       diffuseColor.rgb *= 0.98 + furGrain * 0.025;`,
+       float furWave = sin(vGorillaFurPosition.y * 310.0
+         + vGorillaFurPosition.x * 41.0
+         + sin(vGorillaFurPosition.z * 67.0) * 1.8);
+       float furNoise = sin(vGorillaFurPosition.x * 71.0
+         + vGorillaFurPosition.y * 53.0
+         + vGorillaFurPosition.z * 97.0);
+       diffuseColor.rgb *= 0.965 + furWave * 0.018 + furNoise * 0.012;`,
     );
   };
-  fur.customProgramCacheKey = () => 'catus-gorilla-fur-grain-v1';
+  fur.customProgramCacheKey = () => 'catus-gorilla-fur-detail-v2';
 
   return {
     fur,
     face: new THREE.MeshStandardMaterial({
-      color: MATERIAL_COLORS.face,
-      roughness: 0.5,
-      metalness: 0.01,
+      color: 0xffffff,
+      roughness: 0.72,
+      metalness: 0,
       vertexColors: true,
+      map: faceTexture,
+      bumpMap: faceTexture,
+      bumpScale: 0.006,
     }),
     shadow: new THREE.MeshStandardMaterial({
-      color: MATERIAL_COLORS.shadow,
-      roughness: 0.78,
-      metalness: 0.01,
+      color: 0xffffff,
+      roughness: 0.8,
+      metalness: 0,
       vertexColors: true,
     }),
     iris: new THREE.MeshStandardMaterial({
-      color: MATERIAL_COLORS.iris,
-      roughness: 0.28,
-      metalness: 0.02,
+      color: 0xffffff,
+      roughness: 0.38,
+      metalness: 0,
       vertexColors: true,
     }),
     pupil: new THREE.MeshStandardMaterial({
-      color: MATERIAL_COLORS.pupil,
-      roughness: 0.2,
-      metalness: 0.03,
+      color: 0xffffff,
+      roughness: 0.24,
+      metalness: 0,
       vertexColors: true,
     }),
     glint: new THREE.MeshStandardMaterial({
-      color: MATERIAL_COLORS.glint,
-      roughness: 0.12,
+      color: 0xffffff,
+      roughness: 0.22,
       metalness: 0,
       vertexColors: true,
     }),
@@ -297,7 +378,7 @@ function addGorillaBodyParts(parts: GorillaPart[]) {
       [side * 0.51, 2.69, 0.05],
       [0.34, 0.2, 0.31],
       [['chest', 0.56], [`shoulder_${suffix}`, 0.44]],
-      { color: '#59636d' },
+      { color: '#454644' },
     );
     addPart(parts, 'fur', [side * 0.37, 2.37, 0.3], [0.48, 0.38, 0.29], [['chest', 0.82], [`shoulder_${suffix}`, 0.18]]);
     addPart(parts, 'fur', [side * 0.48, 2.69, -0.03], [0.4, 0.48, 0.37], [['chest', 0.78], [`shoulder_${suffix}`, 0.22]], { saddle: true });
@@ -346,26 +427,27 @@ function addGorillaBodyParts(parts: GorillaPart[]) {
 
 function addGorillaFaceParts(parts: GorillaPart[]) {
   addPart(parts, 'fur', [0, 3.2, -0.02], [0.49, 0.59, 0.44], [['head', 0.88], ['neck', 0.12]]);
-  addPart(parts, 'face', [0, 3.16, 0.29], [0.36, 0.43, 0.22], [['head', 1]], { color: '#25292d' });
-  addPart(parts, 'face', [-0.28, 3.08, 0.24], [0.24, 0.28, 0.22], [['head', 1]], { color: '#25292d' });
-  addPart(parts, 'face', [0.28, 3.08, 0.24], [0.24, 0.28, 0.22], [['head', 1]], { color: '#25292d' });
-  addPart(parts, 'face', [0, 2.97, 0.5], [0.31, 0.23, 0.27], [['head', 0.88], ['jaw', 0.12]], { color: '#303337' });
-  addPart(parts, 'face', [0, 3.075, 0.73], [0.205, 0.135, 0.12], [['head', 1]], { color: '#34373a' });
-  addPart(parts, 'shadow', [-0.094, 3.095, 0.826], [0.052, 0.037, 0.024], [['head', 1]], { color: '#07090b' });
-  addPart(parts, 'shadow', [0.094, 3.095, 0.826], [0.052, 0.037, 0.024], [['head', 1]], { color: '#07090b' });
-  addPart(parts, 'face', [0, 2.79, 0.55], [0.25, 0.095, 0.19], [['jaw', 0.9], ['head', 0.1]], { color: '#24282c' });
-  addPart(parts, 'shadow', [0, 2.865, 0.72], [0.19, 0.026, 0.025], [['jaw', 0.85], ['head', 0.15]], { color: '#0a0d10' });
+  addPart(parts, 'face', [0, 3.18, 0.28], [0.35, 0.42, 0.23], [['head', 1]], { color: '#302a27' });
+  addPart(parts, 'face', [-0.29, 3.08, 0.24], [0.23, 0.28, 0.22], [['head', 1]], { color: '#332c28' });
+  addPart(parts, 'face', [0.29, 3.08, 0.24], [0.23, 0.28, 0.22], [['head', 1]], { color: '#332c28' });
+  addPart(parts, 'face', [0, 2.98, 0.48], [0.34, 0.23, 0.29], [['head', 0.88], ['jaw', 0.12]], { color: '#493e37' });
+  addPart(parts, 'face', [0, 2.99, 0.65], [0.29, 0.17, 0.22], [['head', 1]], { color: '#554840' });
+  addPart(parts, 'face', [0, 3.105, 0.72], [0.235, 0.145, 0.16], [['head', 1]], { color: '#3b322e' });
+  addPart(parts, 'shadow', [-0.102, 3.12, 0.861], [0.052, 0.031, 0.022], [['head', 1]], { color: '#100d0b' });
+  addPart(parts, 'shadow', [0.102, 3.12, 0.861], [0.052, 0.031, 0.022], [['head', 1]], { color: '#100d0b' });
+  addPart(parts, 'face', [0, 2.8, 0.55], [0.25, 0.095, 0.19], [['jaw', 0.9], ['head', 0.1]], { color: '#302824' });
+  addPart(parts, 'shadow', [0, 2.867, 0.724], [0.19, 0.024, 0.026], [['jaw', 0.85], ['head', 0.15]], { color: '#100d0b' });
 
   for (const side of [-1, 1]) {
     const suffix = side < 0 ? 'L' : 'R';
-    addPart(parts, 'fur', [side * 0.175, 3.36, 0.39], [0.22, 0.12, 0.16], [['head', 1]], { color: '#171b1e' });
-    addPart(parts, 'shadow', [side * 0.17, 3.2, 0.49], [0.115, 0.078, 0.066], [[`eye_${suffix}`, 1]], { color: '#090b0d' });
-    addPart(parts, 'face', [side * 0.17, 3.2, 0.535], [0.064, 0.044, 0.034], [[`eye_${suffix}`, 1]], { color: '#9a7446' });
-    addPart(parts, 'iris', [side * 0.17, 3.2, 0.562], [0.031, 0.032, 0.021], [[`eye_${suffix}`, 1]], { color: '#6d4823' });
-    addPart(parts, 'pupil', [side * 0.17, 3.2, 0.578], [0.014, 0.022, 0.014], [[`eye_${suffix}`, 1]], { color: '#090909' });
-    addPart(parts, 'glint', [side * 0.18, 3.211, 0.591], [0.008, 0.008, 0.006], [[`eye_${suffix}`, 1]], { color: '#f2e4ca' });
-    addPart(parts, 'face', [side * 0.52, 3.17, -0.015], [0.13, 0.19, 0.13], [['head', 1]], { color: '#202428' });
-    addPart(parts, 'shadow', [side * 0.565, 3.17, 0.05], [0.057, 0.105, 0.035], [['head', 1]], { color: '#131619' });
+    addPart(parts, 'fur', [side * 0.175, 3.365, 0.38], [0.235, 0.12, 0.17], [['head', 1]], { color: '#1c1a18' });
+    addPart(parts, 'shadow', [side * 0.17, 3.2, 0.49], [0.112, 0.074, 0.065], [[`eye_${suffix}`, 1]], { color: '#100d0b' });
+    addPart(parts, 'face', [side * 0.17, 3.2, 0.535], [0.054, 0.037, 0.031], [[`eye_${suffix}`, 1]], { color: '#80613d' });
+    addPart(parts, 'iris', [side * 0.17, 3.2, 0.56], [0.024, 0.026, 0.019], [[`eye_${suffix}`, 1]], { color: '#4e351f' });
+    addPart(parts, 'pupil', [side * 0.17, 3.2, 0.575], [0.012, 0.019, 0.012], [[`eye_${suffix}`, 1]], { color: '#090807' });
+    addPart(parts, 'glint', [side * 0.18, 3.21, 0.586], [0.005, 0.005, 0.004], [[`eye_${suffix}`, 1]], { color: '#d8cbb5' });
+    addPart(parts, 'face', [side * 0.52, 3.17, -0.015], [0.13, 0.19, 0.13], [['head', 1]], { color: '#27221f' });
+    addPart(parts, 'shadow', [side * 0.565, 3.17, 0.05], [0.057, 0.105, 0.035], [['head', 1]], { color: '#181412' });
   }
 }
 
@@ -395,8 +477,8 @@ export function createGorillaRig(options: { softwareFallback?: boolean } = {}): 
   const skeleton = new THREE.Skeleton(Array.from(bones.values()));
   const boneIndices = new Map(Array.from(bones.keys()).map((name, index) => [name, index]));
   const parts: GorillaPart[] = [];
-  const radialSegments = options.softwareFallback ? 16 : 28;
-  const heightSegments = options.softwareFallback ? 10 : 20;
+  const radialSegments = options.softwareFallback ? 24 : 56;
+  const heightSegments = options.softwareFallback ? 16 : 40;
   addGorillaBodyParts(parts);
   addGorillaFaceParts(parts);
 
