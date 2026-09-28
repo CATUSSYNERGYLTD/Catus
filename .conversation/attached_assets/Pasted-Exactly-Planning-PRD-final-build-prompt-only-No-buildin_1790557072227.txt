@@ -1,0 +1,814 @@
+Exactly. Planning → PRD → final build prompt only. No building yet.
+
+CATUS SYNERGY PARENT COMPANY WEBSITE
+
+1. PLANNING
+
+Vision
+
+Create a high-end, fully animated parent-company website for Catus Synergy Limited, where the website itself feels alive.
+
+The gorilla in the original Catus Synergy logo is the central visual character of the experience.
+
+The site should feel:
+
+Powerful
+
+Premium
+
+Corporate
+
+Futuristic
+
+Confident
+
+Smooth
+
+Motion-driven
+
+International
+
+
+Core concept
+
+“A company that moves.”
+
+The gorilla should not simply be an image sitting in the hero.
+
+It becomes the living visual identity of the website.
+
+As the visitor interacts with the website:
+
+Gorilla subtly breathes
+
+Head/body makes controlled movements
+
+Eyes/face can have subtle motion where technically possible
+
+Gorilla reacts to cursor movement
+
+Gorilla responds to scrolling
+
+Gorilla moves between sections
+
+Logo elements can separate/reassemble during transitions
+
+Background responds to the gorilla's movement
+
+Sections transition cinematographically
+
+
+The animation must remain faithful to the original Catus Synergy logo.
+
+Website personality
+
+Think:
+
+Corporate website + interactive digital experience + motion branding.
+
+Not:
+
+Generic company template
+
+Static WordPress-style site
+
+Excessive cards
+
+Random 3D gorilla
+
+Stock imagery
+
+Overloaded gradients
+
+
+
+---
+
+2. PRD
+
+Product
+
+Catus Synergy Limited — Parent Company Website
+
+Tagline
+
+Cooperative Attitude Towards Growth
+
+Primary objective
+
+Present Catus Synergy as a parent company that builds, manages, connects and grows businesses across multiple sectors.
+
+Secondary objectives
+
+Establish strong corporate identity
+
+Introduce the company's business areas
+
+Communicate its philosophy
+
+Showcase its portfolio
+
+Create a memorable digital experience
+
+Generate business enquiries
+
+Establish a foundation for future subsidiaries
+
+
+
+---
+
+3. WEBSITE STRUCTURE
+
+PAGE 01 — HERO
+
+This is the most important section.
+
+Visual
+
+Full-screen cinematic hero.
+
+The original Catus gorilla logo occupies a major portion of the screen.
+
+Background:
+
+Deep navy / almost black blue
+
+with subtle atmospheric movement.
+
+Hero copy
+
+CATUS SYNERGY
+
+Main headline
+
+Building What Moves Growth.
+
+Supporting text:
+
+> A diversified parent company building, managing and connecting ventures, services and opportunities for sustainable growth.
+
+
+
+Buttons:
+
+EXPLORE CATUS SYNERGY
+
+OUR BUSINESSES
+
+Animation
+
+Initial load:
+
+1. Screen starts almost completely dark.
+
+
+2. Small particles begin appearing.
+
+
+3. Logo geometry gradually forms.
+
+
+4. Gorilla emerges.
+
+
+5. Gorilla makes a subtle breathing movement.
+
+
+6. Catus wordmark appears.
+
+
+7. Headline reveals.
+
+
+8. CTA buttons slide/fade into position.
+
+
+
+Interaction
+
+Cursor movement creates subtle parallax.
+
+Moving cursor left → gorilla subtly looks/moves left.
+
+Moving cursor right → gorilla subtly responds right.
+
+Scrolling → gorilla transitions with the page rather than simply disappearing.
+
+
+---
+
+4. SECTION — WHO WE ARE
+
+Large typography.
+
+Heading
+
+WE BUILD WITH PURPOSE.
+
+Content introduces Catus Synergy as the parent company.
+
+Animation:
+
+As the user scrolls:
+
+Large typography moves slowly
+
+Gorilla silhouette/watermark passes behind content
+
+Text reveals progressively
+
+Background subtly shifts
+
+
+
+---
+
+5. SECTION — OUR BUSINESSES
+
+This should feel like entering the Catus ecosystem.
+
+Heading
+
+OUR BUSINESSES
+
+Business areas:
+
+01
+
+Real Estate & Construction
+
+02
+
+Environmental Management
+
+03
+
+Property Management
+
+04
+
+Import & Export
+
+05
+
+Consultancy
+
+06
+
+Cleaning Services
+
+Each business becomes an animated interactive panel.
+
+Hover:
+
+Panel expands
+
+Typography changes position
+
+Gorilla/brand visual reacts
+
+Background transitions
+
+Number enlarges
+
+
+
+---
+
+6. SECTION — THE SYNERGY
+
+This is where the company philosophy becomes visual.
+
+Main statement
+
+COOPERATIVE ATTITUDE TOWARDS GROWTH
+
+Break it into:
+
+COOPERATION
+
+INNOVATION
+
+PEOPLE
+
+PARTNERSHIP
+
+GROWTH
+
+Each word appears through motion.
+
+Example:
+
+COOPERATION → PARTNERSHIP → PEOPLE → INNOVATION → GROWTH
+
+Eventually everything converges into the Catus Synergy logo.
+
+
+---
+
+7. SECTION — THE GORILLA
+
+A dedicated brand-story section.
+
+Heading
+
+THE SYMBOL
+
+Explain the gorilla as the company's visual symbol.
+
+The gorilla becomes a large animated visual.
+
+Animation can include:
+
+breathing
+
+slight movement
+
+light passing across the logo
+
+geometric components shifting
+
+subtle camera movement
+
+scroll-driven transformation
+
+
+The original logo artwork remains recognizable.
+
+
+---
+
+8. SECTION — OUR APPROACH
+
+Four major principles:
+
+BUILD
+
+We build.
+
+CONNECT
+
+We connect opportunities and people.
+
+MANAGE
+
+We manage with discipline.
+
+GROW
+
+We grow sustainably.
+
+Each principle gets its own animated transition.
+
+
+---
+
+9. FUTURE PORTFOLIO SECTION
+
+Heading
+
+THE CATUS ECOSYSTEM
+
+Designed specifically for future subsidiaries.
+
+Example structure:
+
+CATUS SYNERGY
+      │
+      ├── Company / Brand 01
+      ├── Company / Brand 02
+      ├── Company / Brand 03
+      ├── Company / Brand 04
+      └── Company / Brand 05
+
+The ecosystem should be interactive.
+
+Clicking a company opens its profile.
+
+
+---
+
+10. CONTACT
+
+Minimal premium section.
+
+Heading
+
+LET'S BUILD WHAT'S NEXT.
+
+Contact:
+
+Lagos, Nigeria
+
+info@catussynergy.com
+
+09063412678
+
+Social:
+
+@Catus_synergy
+
+CTA:
+
+START A CONVERSATION
+
+
+---
+
+11. FOOTER
+
+Catus Synergy logo.
+
+Cooperative Attitude Towards Growth
+
+Navigation.
+
+Contact.
+
+Socials.
+
+Copyright.
+
+
+---
+
+12. MOTION SYSTEM
+
+This website is motion-first.
+
+Required motion
+
+Page-load animation
+
+Logo reveal
+
+Gorilla idle animation
+
+Cursor interaction
+
+Mouse parallax
+
+Scroll animations
+
+Scroll-triggered transitions
+
+Text reveal
+
+Section transitions
+
+Hover interactions
+
+Magnetic buttons
+
+Background particle movement
+
+Logo transformation
+
+Smooth page transitions
+
+Mobile touch interactions
+
+
+Important
+
+Motion must feel:
+
+slow + powerful + intentional
+
+Not:
+
+fast + flashy + distracting.
+
+
+---
+
+13. MOBILE EXPERIENCE
+
+Mobile should not simply be a smaller desktop version.
+
+The gorilla animation should be optimized specifically for mobile.
+
+Use:
+
+Touch-based interaction
+
+Reduced particle count
+
+Reduced animation complexity
+
+Optimized assets
+
+Smooth 60fps target where possible
+
+
+Respect:
+
+prefers-reduced-motion
+
+
+---
+
+14. DESIGN SYSTEM
+
+Primary
+
+Deep Navy
+
+Secondary
+
+Royal / Electric Blue
+
+Background
+
+White and deep navy sections.
+
+Typography
+
+Large editorial headings.
+
+Strong geometric typography.
+
+Minimal text.
+
+Visual principle
+
+Less UI. More experience.
+
+
+---
+
+15. FINAL BUILD PROMPT
+
+Use this as the actual prompt for the website builder:
+
+Build a premium, cinematic, motion-first parent-company website for Catus Synergy Limited.
+
+COMPANY:
+Catus Synergy Limited
+
+TAGLINE:
+"Cooperative Attitude Towards Growth"
+
+LOCATION:
+Lagos, Nigeria
+
+EMAIL:
+info@catussynergy.com
+
+PHONE:
+09063412678
+
+SOCIAL:
+@Catus_synergy
+
+CORE BRAND REQUIREMENT:
+
+Use the ORIGINAL Catus Synergy main logo supplied with this project as the single source of truth.
+
+DO NOT redraw the logo.
+DO NOT create a new gorilla.
+DO NOT replace the gorilla.
+DO NOT reinterpret the logo.
+DO NOT distort the logo proportions.
+
+The gorilla in the original logo must become the central animated visual identity of the website.
+
+THIS IS A FULLY ANIMATED MOTION WEBSITE.
+
+The website should feel like a premium global parent-company digital experience rather than a normal corporate template.
+
+CORE CREATIVE CONCEPT:
+
+"A COMPANY THAT MOVES."
+
+The gorilla should feel alive.
+
+Hero animation should include:
+- subtle breathing motion
+- controlled body/head movement
+- subtle light movement across the logo
+- cursor/parallax response
+- scroll interaction
+- cinematic entrance animation
+- smooth transitions between sections
+
+Do NOT use a random 3D gorilla or stock gorilla.
+
+Animate the actual supplied Catus Synergy gorilla/logo artwork.
+
+HERO:
+
+Full-screen cinematic hero.
+
+Dark deep-navy background.
+
+The gorilla/logo is the dominant visual.
+
+Opening sequence:
+
+1. Dark screen.
+2. Atmospheric particles appear.
+3. Logo geometry begins forming.
+4. Gorilla emerges.
+5. Gorilla performs subtle idle movement.
+6. Catus Synergy wordmark appears.
+7. Headline reveals.
+8. CTA buttons appear.
+
+Headline:
+
+"Building What Moves Growth."
+
+Supporting copy:
+
+"A diversified parent company building, managing and connecting ventures, services and opportunities for sustainable growth."
+
+Buttons:
+
+"EXPLORE CATUS SYNERGY"
+
+"OUR BUSINESSES"
+
+NAVIGATION:
+
+Home
+About
+Businesses
+Approach
+Ecosystem
+Contact
+
+SECTION 1 — ABOUT:
+
+Headline:
+
+"WE BUILD WITH PURPOSE."
+
+Introduce Catus Synergy as a diversified parent company.
+
+Use large typography and scroll-based animation.
+
+SECTION 2 — BUSINESSES:
+
+Headline:
+
+"OUR BUSINESSES"
+
+Show:
+
+Real Estate & Construction
+Environmental Management
+Property Management
+Import & Export
+Consultancy
+Cleaning Services
+
+Each business should have sophisticated hover/scroll interactions.
+
+SECTION 3 — SYNERGY:
+
+Headline:
+
+"COOPERATIVE ATTITUDE TOWARDS GROWTH"
+
+Animate:
+
+COOPERATION
+PARTNERSHIP
+PEOPLE
+INNOVATION
+GROWTH
+
+These elements should eventually visually converge into the Catus Synergy logo.
+
+SECTION 4 — THE SYMBOL:
+
+Create a dedicated visual section explaining the gorilla as the company's symbolic identity.
+
+Make the gorilla extremely large and interactive.
+
+Use:
+- subtle breathing
+- movement
+- light
+- parallax
+- scroll-driven animation
+- geometric transitions
+
+Keep the original logo recognizable.
+
+SECTION 5 — OUR APPROACH:
+
+BUILD
+CONNECT
+MANAGE
+GROW
+
+Each principle gets a cinematic transition.
+
+SECTION 6 — ECOSYSTEM:
+
+Create an interactive parent-company ecosystem visualization.
+
+CATUS SYNERGY should sit at the center.
+
+Design the architecture so future subsidiaries and brands can easily be added.
+
+SECTION 7 — CONTACT:
+
+Headline:
+
+"LET'S BUILD WHAT'S NEXT."
+
+Display:
+
+Lagos, Nigeria
+info@catussynergy.com
+09063412678
+@Catus_synergy
+
+CTA:
+
+"START A CONVERSATION"
+
+FOOTER:
+
+Original Catus Synergy logo.
+Cooperative Attitude Towards Growth.
+Navigation.
+Contact.
+Social.
+Copyright.
+
+DESIGN:
+
+Premium.
+Minimal.
+Corporate.
+Futuristic.
+Powerful.
+Elegant.
+
+Colors:
+Deep navy
+Royal/electric blue
+White
+
+Avoid gold.
+
+Avoid excessive gradients.
+
+Avoid generic SaaS layouts.
+
+Avoid excessive cards.
+
+Avoid stock photography.
+
+Avoid random illustrations.
+
+MOTION:
+
+Use high-performance animation.
+
+Use Framer Motion and/or GSAP where appropriate.
+
+Use CSS/Web Animations for lightweight effects.
+
+Target smooth 60fps animation.
+
+Use scroll-driven animation.
+
+Use cursor interaction on desktop.
+
+Use touch-friendly interactions on mobile.
+
+Respect prefers-reduced-motion and provide a reduced-motion experience.
+
+PERFORMANCE:
+
+Lazy-load non-critical assets.
+
+Optimize logo assets.
+
+Do not make the animation block the initial page render.
+
+Keep animation modular.
+
+RESPONSIVE:
+
+Desktop
+Tablet
+Mobile
+
+The mobile experience must be intentionally designed rather than simply shrinking the desktop layout.
+
+IMPORTANT:
+
+The Catus Synergy logo and gorilla are the brand identity.
+
+The website must make the visitor immediately understand:
+
+CATUS SYNERGY = A PARENT COMPANY THAT BUILDS, CONNECTS, MANAGES AND GROWS.
+
+Make the final result feel like a world-class interactive corporate website.

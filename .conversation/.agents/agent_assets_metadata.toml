@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "lq-GaISj5_eCkFIlypKfp"
+uri = "file://catus-synergy-planning-prd-build-prompt.md"
+type = "text"
+title = "Catus Synergy — Updated Planning & Build Prompt"
+description = "Updated to distinguish the supplied standalone gorilla mark and full wordmark, and to preserve their royal-blue field. Planning only; no website implementation included."
+logical_id = "3ff53576-3c67-4516-acf6-c3aa91d32b39"
+content_hash = "sha256:1ee3c172d317a99e1b69a7143025d725ed0a1a87fe6e7ac9e2af9b69f8e1a951"
+size = 22426
+mtime_ms = 1790557261727
+storage_uri = "gcs://replit-rams-assets-spock/rams/assets/conversation:b5e8102f-ebac-49a0-b25a-7245c633c118/3ff53576-3c67-4516-acf6-c3aa91d32b39/8a0be3d0-3d89-47c9-b0df-d6dcfdf8506a"
+storage_version_token = "1790557266188769"
+content_type = "text/markdown"

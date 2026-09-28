@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Catus Synergy"
+description = "A cinematic corporate website for Catus Synergy Limited, presenting its business areas, cooperative growth philosophy, parent-company ecosystem, and contact information."
+version = "1.0.0"
+id = "artifacts/catus-synergy"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24902
+
+[services.development]
+run = "pnpm --filter @workspace/catus-synergy run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/catus-synergy", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/catus-synergy/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24902"
+BASE_PATH = "/"
