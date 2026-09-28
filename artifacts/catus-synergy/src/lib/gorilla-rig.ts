@@ -620,11 +620,25 @@ export function createGorillaRig(options: { softwareFallback?: boolean } = {}): 
   addGorillaBodyParts(parts);
   addGorillaFaceParts(parts);
 
+  const furParts = parts.filter((part) => part.material === 'fur');
+  const furArea = (part: GorillaPart) => {
+    const [x, y, z] = part.radius;
+    const power = 1.6075;
+    return 4 * Math.PI * (
+      (Math.pow(x * y, power) + Math.pow(x * z, power) + Math.pow(y * z, power)) / 3
+    ) ** (1 / power);
+  };
+  const totalFurArea = furParts.reduce((total, part) => total + furArea(part), 0);
+  const totalStrands = options.softwareFallback ? 8_000 : 160_000;
   const geometriesByMaterial = new Map<MaterialName, THREE.BufferGeometry[]>();
   parts.forEach((part) => {
     const geometry = makeEllipsoid(part, boneIndices, radialSegments, heightSegments);
     const geometries = geometriesByMaterial.get(part.material) ?? [];
     geometries.push(geometry);
+    if (part.material === 'fur') {
+      const strandCount = Math.max(1, Math.round(totalStrands * furArea(part) / totalFurArea));
+      geometries.push(makeFurStrands(part, boneIndices, strandCount));
+    }
     geometriesByMaterial.set(part.material, geometries);
   });
 
@@ -754,11 +768,20 @@ export function animateGorillaRig(rig: GorillaRig, motion: GorillaMotion) {
 }
 
 export function disposeGorillaRig(rig: GorillaRig) {
+  const disposedTextures = new Set<THREE.Texture>();
   rig.root.traverse((object) => {
     if (object instanceof THREE.SkinnedMesh) {
       object.geometry.dispose();
-      if (Array.isArray(object.material)) object.material.forEach((material) => material.dispose());
-      else object.material.dispose();
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      materials.forEach((material) => {
+        Object.values(material).forEach((value) => {
+          if (value instanceof THREE.Texture && !disposedTextures.has(value)) {
+            disposedTextures.add(value);
+            value.dispose();
+          }
+        });
+        material.dispose();
+      });
     }
   });
 }

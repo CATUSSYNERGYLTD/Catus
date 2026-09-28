@@ -224,7 +224,7 @@ export function renderSoftwareGorilla(
         0,
         normalX * blueRimDirection.x + normalY * blueRimDirection.y + normalZ * blueRimDirection.z,
       );
-      const shading = 0.72 + keyLight * 0.58 + rimLight * 0.34;
+      const shading = 0.82 + keyLight * 0.62 + rimLight * 0.42;
       const red = (
         colors.getX(a) + colors.getX(b) + colors.getX(c)
       ) / 3 * shading;

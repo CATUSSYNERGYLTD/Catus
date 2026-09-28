@@ -327,7 +327,7 @@ export function GorillaScene() {
         ref={canvasRef}
         className={`gorilla-scene__canvas${softwareFallback ? ' gorilla-scene__canvas--hidden' : ''}`}
         role="img"
-        aria-label="Interactive 3D silverback gorilla with continuous breathing and natural body movement"
+        aria-label="Interactive 3D silverback gorilla that follows the pointer and sits or stands with page scrolling"
       />
       <canvas
         ref={softwareCanvasRef}
@@ -339,7 +339,7 @@ export function GorillaScene() {
           <p>This browser cannot render the 3D gorilla.</p>
         </div>
       )}
-      <span className="sr-only">A full-body silverback gorilla breathes, shifts its weight, moves its head and hands, and follows your cursor.</span>
+      <span className="sr-only">A full-body silverback gorilla follows your cursor and moves between standing and seated poses as you scroll.</span>
     </div>
   );
 }
