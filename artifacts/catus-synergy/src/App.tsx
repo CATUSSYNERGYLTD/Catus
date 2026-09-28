@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ArrowDownRight, ArrowUpRight, Mail, MapPin, Menu, Phone, X } from 'lucide-react';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -107,9 +107,104 @@ function Header({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (op
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeBusiness, setActiveBusiness] = useState(0);
+  const heroLogoRef = useRef<HTMLDivElement>(null);
+  const symbolLogoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.title = 'Catus Synergy Limited — Building What Moves Growth';
+  }, []);
+
+  useEffect(() => {
+    const revealElements = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-scroll-reveal]'),
+    );
+    let revealObserver: IntersectionObserver | undefined;
+
+    if ('IntersectionObserver' in window && revealElements.length > 0) {
+      document.documentElement.classList.add('scroll-reveal-ready');
+      revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-in-view');
+              revealObserver?.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -7% 0px' },
+      );
+      revealElements.forEach((element) => revealObserver?.observe(element));
+    }
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const motionNodes = [heroLogoRef.current, symbolLogoRef.current].filter(
+      (node): node is HTMLDivElement => node !== null,
+    );
+
+    if (motionQuery.matches || motionNodes.length === 0) {
+      return () => {
+        revealObserver?.disconnect();
+        document.documentElement.classList.remove('scroll-reveal-ready');
+      };
+    }
+
+    const resetPointer = (node: HTMLDivElement) => {
+      node.style.setProperty('--pointer-x', '0px');
+      node.style.setProperty('--pointer-y', '0px');
+      node.style.setProperty('--pointer-rotate', '0deg');
+    };
+
+    const cleanups = motionNodes.map((node) => {
+      const handlePointerMove = (event: PointerEvent) => {
+        if (event.pointerType !== 'mouse') return;
+        const bounds = node.getBoundingClientRect();
+        const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+        node.style.setProperty('--pointer-x', `${horizontal * 12}px`);
+        node.style.setProperty('--pointer-y', `${vertical * 10}px`);
+        node.style.setProperty('--pointer-rotate', `${horizontal * 1.2}deg`);
+      };
+      const handlePointerLeave = () => resetPointer(node);
+
+      node.addEventListener('pointermove', handlePointerMove);
+      node.addEventListener('pointerleave', handlePointerLeave);
+
+      return () => {
+        node.removeEventListener('pointermove', handlePointerMove);
+        node.removeEventListener('pointerleave', handlePointerLeave);
+        resetPointer(node);
+      };
+    });
+
+    let scrollFrame = 0;
+    const updateScrollMotion = () => {
+      if (scrollFrame) return;
+      scrollFrame = window.requestAnimationFrame(() => {
+        motionNodes.forEach((node) => {
+          const bounds = node.getBoundingClientRect();
+          const progress = Math.min(
+            1,
+            Math.max(0, -bounds.top / Math.max(window.innerHeight, 1)),
+          );
+          node.style.setProperty('--scroll-y', `${-progress * 28}px`);
+          node.style.setProperty('--scroll-scale', `${1 - progress * 0.025}`);
+          node.style.setProperty('--scroll-opacity', `${1 - progress * 0.2}`);
+        });
+        scrollFrame = 0;
+      });
+    };
+
+    window.addEventListener('scroll', updateScrollMotion, { passive: true });
+    updateScrollMotion();
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+      window.removeEventListener('scroll', updateScrollMotion);
+      if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+      revealObserver?.disconnect();
+      document.documentElement.classList.remove('scroll-reveal-ready');
+    };
   }, []);
 
   return (
@@ -146,9 +241,10 @@ function Home() {
             <div className="relative flex min-h-[310px] items-center justify-center lg:min-h-[540px]">
               <div className="absolute h-[min(72vw,510px)] w-[min(72vw,510px)] rounded-full border border-blue-300/15" />
               <div className="absolute h-[min(56vw,395px)] w-[min(56vw,395px)] rounded-full border border-dashed border-blue-300/15" />
-              <div className="logo-frame blue-field relative h-[min(68vw,430px)] w-[min(68vw,430px)] overflow-hidden">
-                <img src="/brand/catus-gorilla-mark.png" alt="Catus Synergy gorilla mark" className="ambient-drift h-full w-full object-cover" data-testid="img-hero-gorilla" />
-                <span className="absolute bottom-5 left-5 font-mono-brand text-[9px] uppercase tracking-[.18em] text-white/70">Original mark / 01</span>
+              <div ref={heroLogoRef} data-logo-motion className="logo-frame blue-field logo-motion-frame logo-light-frame logo-entry relative h-[min(68vw,430px)] w-[min(68vw,430px)] overflow-hidden">
+                <img src="/brand/catus-gorilla-mark.png" alt="Catus Synergy gorilla mark" className="logo-breathe h-full w-full object-cover" data-testid="img-hero-gorilla" />
+                <span aria-hidden="true" className="logo-light-pass" />
+                <span className="absolute bottom-5 left-5 z-[2] font-mono-brand text-[9px] uppercase tracking-[.18em] text-white/70">Original mark / 01</span>
               </div>
             </div>
           </div>
@@ -157,7 +253,7 @@ function Home() {
         </section>
 
         <section id="about" className="section-pad relative border-t border-slate-700/40" aria-labelledby="about-title">
-          <div className="container-wide grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-24">
+          <div className="container-wide grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-24" data-scroll-reveal>
             <div>
               <span className="eyebrow">02 / The company</span>
               <div className="mt-8 h-px w-20 bg-blue-500" />
@@ -177,7 +273,7 @@ function Home() {
         </section>
 
         <section id="businesses" className="section-pad border-t border-slate-700/40 bg-[#091527]" aria-labelledby="businesses-title">
-          <div className="container-wide">
+          <div className="container-wide" data-scroll-reveal>
             <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
               <div>
                 <span className="eyebrow">03 / Areas of work</span>
@@ -210,7 +306,7 @@ function Home() {
 
         <section id="synergy" className="section-pad relative overflow-hidden border-t border-slate-700/40" aria-labelledby="synergy-title">
           <div className="absolute right-[-10%] top-16 h-[430px] w-[430px] rounded-full border border-blue-500/10" />
-          <div className="container-wide relative">
+          <div className="container-wide relative" data-scroll-reveal>
             <div className="grid gap-12 lg:grid-cols-[.7fr_1.3fr] lg:gap-24">
               <div>
                 <span className="eyebrow">04 / The synergy</span>
@@ -232,10 +328,11 @@ function Home() {
         </section>
 
         <section className="section-pad-tight border-t border-slate-700/40 bg-[#0b1b34]" aria-labelledby="symbol-title">
-          <div className="container-wide grid items-center gap-12 lg:grid-cols-[1fr_1fr]">
-            <div className="blue-field logo-frame relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden">
-              <img src="/brand/catus-gorilla-mark.png" alt="The Catus Synergy gorilla visual symbol" loading="lazy" className="h-full w-full object-cover" data-testid="img-symbol-gorilla" />
-              <span className="absolute left-6 top-6 font-mono-brand text-[9px] uppercase tracking-[.18em] text-white/70">The symbol</span>
+          <div className="container-wide grid items-center gap-12 lg:grid-cols-[1fr_1fr]" data-scroll-reveal>
+            <div ref={symbolLogoRef} data-logo-motion className="blue-field logo-frame logo-motion-frame logo-light-frame relative mx-auto aspect-square w-full max-w-[520px] overflow-hidden">
+              <img src="/brand/catus-gorilla-mark.png" alt="The Catus Synergy gorilla visual symbol" loading="lazy" className="logo-breathe h-full w-full object-cover" data-testid="img-symbol-gorilla" />
+              <span aria-hidden="true" className="logo-light-pass" />
+              <span className="absolute left-6 top-6 z-[2] font-mono-brand text-[9px] uppercase tracking-[.18em] text-white/70">The symbol</span>
             </div>
             <div className="lg:pl-10">
               <span className="eyebrow">05 / The symbol</span>
@@ -246,7 +343,7 @@ function Home() {
         </section>
 
         <section id="approach" className="section-pad border-t border-slate-700/40" aria-labelledby="approach-title">
-          <div className="container-wide">
+          <div className="container-wide" data-scroll-reveal>
             <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
               <div>
                 <span className="eyebrow">06 / How we move</span>
@@ -270,7 +367,7 @@ function Home() {
         </section>
 
         <section id="ecosystem" className="section-pad border-t border-slate-700/40 bg-[#091527]" aria-labelledby="ecosystem-title">
-          <div className="container-wide">
+          <div className="container-wide" data-scroll-reveal>
             <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-24">
               <div>
                 <span className="eyebrow">07 / Future-facing</span>
@@ -304,7 +401,7 @@ function Home() {
 
         <section id="contact" className="section-pad relative overflow-hidden border-t border-slate-700/40" aria-labelledby="contact-title">
           <div className="hero-orb pointer-events-none absolute -left-[20%] bottom-[-30%] h-[600px] w-[600px] rounded-full opacity-45" />
-          <div className="container-wide relative">
+          <div className="container-wide relative" data-scroll-reveal>
             <span className="eyebrow">08 / Start here</span>
             <div className="mt-8 flex flex-col justify-between gap-12 lg:flex-row lg:items-end">
               <h2 id="contact-title" className="display max-w-[850px] text-[clamp(3.6rem,9vw,9rem)] font-medium text-slate-50">Let’s build<br /><span className="text-blue-400">what’s next.</span></h2>
