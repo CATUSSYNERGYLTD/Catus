@@ -1,0 +1,585 @@
+Catus Synergy Limited — Website PRD
+
+1. Product Overview
+
+Company: Catus Synergy Limited
+Tagline: Cooperative Attitude Towards Growth
+Website Type: Premium corporate parent-company website
+Reference: Je’don Group website structure and content organization
+Design Direction: Clean, bright, modern, image-led corporate website.
+
+The website should communicate Catus Synergy as a diversified company operating across multiple business sectors.
+
+
+---
+
+2. Design Direction
+
+Visual style
+
+Predominantly white/light background
+
+Catus Synergy blue used as an accent
+
+Clean corporate typography
+
+Large photography
+
+Generous spacing
+
+Premium but approachable
+
+Smooth animations
+
+No predominantly deep-blue background
+
+No predominantly black background
+
+No animated gorilla
+
+No replacement gorilla illustration
+
+
+Hero concept
+
+The hero occupies approximately the full viewport.
+
+It uses a full-screen slideshow of high-quality images representing Catus Synergy's businesses.
+
+Example:
+
+Slide 01
+Real Estate & Construction
+
+Slide 02
+Environmental Management
+
+Slide 03
+Property Management
+
+Slide 04
+Import & Export
+
+Slide 05
+Consultancy
+
+Slide 06
+Cleaning Services
+
+Each slide contains:
+
+Full-screen image
+
+Subtle Catus Synergy logo watermark
+
+Animated headline
+
+Short supporting text
+
+Animated CTA
+
+Slide indicator
+
+Smooth image transition
+
+
+The text should animate independently from the image.
+
+
+---
+
+3. Website Structure
+
+Header
+
+Logo:
+
+Catus Synergy Limited
+
+Navigation:
+
+Home
+
+About Us
+
+Our Services
+
+Our Businesses
+
+Projects
+
+Partners
+
+Contact
+
+
+CTA:
+
+Let's Talk
+
+Header should remain clean and responsive.
+
+
+---
+
+4. Hero Section
+
+Purpose
+
+Immediately communicate what Catus Synergy does.
+
+Content
+
+Catus Synergy Limited
+
+Cooperative Attitude Towards Growth
+
+Dynamic business messaging over the slideshow.
+
+Example:
+
+> BUILDING SPACES.
+CREATING VALUE.
+
+
+
+CTA:
+
+Explore Our Services
+
+Secondary CTA:
+
+Contact Us
+
+Animation
+
+Image crossfade/slide
+
+Headline reveal
+
+Supporting text fade/reveal
+
+CTA animation
+
+Watermark movement kept extremely subtle
+
+Automatic slideshow
+
+Manual slide controls
+
+Smooth transition between slides
+
+
+
+---
+
+5. Who We Are
+
+Large editorial section inspired by the corporate structure of the reference website.
+
+Content introduces Catus Synergy Limited, its philosophy and its diversified operations.
+
+Layout:
+
+Large statement + company description + supporting image
+
+CTA:
+
+Discover Catus Synergy →
+
+
+---
+
+6. Our Services
+
+Keep this as a major section.
+
+Services
+
+01 — Real Estate & Construction
+
+02 — Environmental Management
+
+03 — Property Management
+
+04 — Import & Export
+
+05 — Consultancy
+
+06 — Cleaning Services
+
+Each service should have:
+
+High-quality image
+
+Number
+
+Service name
+
+Short description
+
+Hover animation
+
+Arrow/link
+
+
+
+---
+
+7. Partners / People We've Worked With
+
+Section heading:
+
+TRUSTED BY
+
+Display actual companies/organisations Catus Synergy has worked with.
+
+Use a continuously moving horizontal carousel.
+
+Features:
+
+Infinite horizontal movement
+
+Pause on hover
+
+Responsive
+
+Logos remain clean and readable
+
+Grayscale or subtle treatment where appropriate
+
+No fabricated partner logos
+
+
+
+---
+
+8. Our Work / Projects
+
+Visual project showcase.
+
+Large image cards with:
+
+Project image
+
+Project name
+
+Category
+
+Location
+
+Short description
+
+
+Interaction:
+
+Hover → image movement + information reveal.
+
+
+---
+
+9. Our Approach
+
+Four-stage visual process:
+
+01
+
+UNDERSTAND
+
+02
+
+PLAN
+
+03
+
+EXECUTE
+
+04
+
+GROW
+
+Use scroll-based animation to reveal each stage.
+
+
+---
+
+10. Why Catus Synergy
+
+Create a concise corporate positioning section around:
+
+Cooperative Attitude Towards Growth
+
+Focus on:
+
+Collaboration
+
+Professionalism
+
+Innovation
+
+Partnership
+
+People
+
+Growth
+
+
+
+---
+
+11. Leadership
+
+Ernest Ihejirika Nwachukwu
+
+Chief Executive Officer
+
+Professional portrait and short leadership statement.
+
+
+---
+
+12. Contact
+
+Large final CTA.
+
+LET'S BUILD SOMETHING MEANINGFUL.
+
+Catus Synergy Limited
+Lagos, Nigeria
+
+09063412678
+info@catussynergy.com
+
+Social:
+
+Catus_synergy
+
+CTA:
+
+Get In Touch →
+
+
+---
+
+13. Footer
+
+Catus Synergy logo
+
+Cooperative Attitude Towards Growth
+
+Navigation links
+
+Services
+
+Contact information
+
+Social links
+
+Copyright.
+
+
+---
+
+MASTER BUILD PROMPT
+
+Redesign the Catus Synergy Limited corporate website using the structure and information architecture of https://www.jedongroup.com/ as the reference.
+
+Do NOT copy Je'don's visual design, branding, text, images, logo, or identity. Use it only as a structural reference for how a diversified parent company can present its businesses, services, projects, leadership, partners, and contact information.
+
+COMPANY:
+
+Catus Synergy Limited
+
+TAGLINE:
+
+"Cooperative Attitude Towards Growth"
+
+The website must feel like a premium Nigerian diversified parent company website.
+
+DESIGN:
+
+Use a predominantly WHITE and light visual system.
+
+Do NOT use a predominantly deep-blue or deep-black website.
+
+Use Catus Synergy blue as an accent colour.
+
+Use large high-quality photography, clean typography, generous whitespace, strong editorial layouts, and premium corporate presentation.
+
+Do NOT use an animated gorilla.
+
+Do NOT create a replacement gorilla.
+
+Do NOT invent a new logo.
+
+Use the Catus Synergy branding appropriately as provided.
+
+HERO:
+
+Create a FULL-SCREEN HERO SLIDESHOW.
+
+The hero should occupy the majority of the first viewport.
+
+Use high-quality imagery representing the company's different business activities.
+
+Hero slides should represent:
+
+1. Real Estate & Construction
+2. Environmental Management
+3. Property Management
+4. Import & Export
+5. Consultancy
+6. Cleaning Services
+
+Each slide must have:
+
+- Full-screen photographic background
+- Subtle Catus Synergy logo watermark
+- Animated headline
+- Supporting text
+- Animated CTA
+- Slide number/indicator
+- Smooth transition into the next slide
+
+The images should transition smoothly while the text independently animates in and out.
+
+Use sophisticated motion rather than excessive effects.
+
+HERO EXAMPLE:
+
+"Catus Synergy Limited"
+
+"Cooperative Attitude Towards Growth"
+
+"BUILDING SPACES. CREATING VALUE."
+
+CTA:
+"Explore Our Services"
+
+SECONDARY CTA:
+"Contact Us"
+
+NAVIGATION:
+
+Home
+About Us
+Our Services
+Our Businesses
+Projects
+Partners
+Contact
+
+CTA:
+"Let's Talk"
+
+WHO WE ARE:
+
+Create a large editorial corporate introduction section explaining Catus Synergy Limited and its diversified operations.
+
+Use large typography, supporting imagery and a clear CTA.
+
+OUR SERVICES:
+
+Create a major services section containing:
+
+01 Real Estate & Construction
+02 Environmental Management
+03 Property Management
+04 Import & Export
+05 Consultancy
+06 Cleaning Services
+
+Each service should have a large image, title, number, description and subtle hover interaction.
+
+PARTNERS:
+
+Create a "Trusted By" section.
+
+Display real Catus Synergy partner/client logos in a smooth horizontal carousel.
+
+Do not invent companies or logos.
+
+The carousel should continuously move horizontally and pause on interaction.
+
+PROJECTS:
+
+Create a visually strong project showcase with large images.
+
+Each project card should contain:
+
+Project name
+Category
+Location
+Short description
+
+Add smooth hover interactions.
+
+OUR APPROACH:
+
+Create an animated four-step section:
+
+01 UNDERSTAND
+02 PLAN
+03 EXECUTE
+04 GROW
+
+Reveal each stage progressively during scrolling.
+
+WHY CATUS SYNERGY:
+
+Create a section built around:
+
+"Cooperative Attitude Towards Growth"
+
+Highlight:
+
+Innovation
+Partnership
+People
+Growth
+
+LEADERSHIP:
+
+Create a professional leadership section for:
+
+Ernest Ihejirika Nwachukwu
+Chief Executive Officer
+
+CONTACT:
+
+Create a strong final CTA:
+
+"LET'S BUILD SOMETHING MEANINGFUL."
+
+Catus Synergy Limited
+Lagos, Nigeria
+09063412678
+info@catussynergy.com
+Catus_synergy
+
+FOOTER:
+
+Include logo, tagline, navigation, services, contact details, social links and copyright.
+
+RESPONSIVE:
+
+The entire website must work properly on desktop, tablet and mobile.
+
+MOTION:
+
+Use smooth professional animations throughout the website:
+
+- Hero image transitions
+- Animated hero typography
+- Scroll reveals
+- Image movement
+- Hover interactions
+- Service card transitions
+- Partner carousel
+- Project transitions
+- Smooth section entrances
+- Subtle page transitions
+
+Keep the motion premium and controlled.
+
+The website should feel like a serious, established parent company while remaining modern, bright and visually engaging.
