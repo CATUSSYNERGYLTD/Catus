@@ -265,6 +265,120 @@ function makeEllipsoid(
   return geometry;
 }
 
+function makeFurStrands(
+  part: GorillaPart,
+  boneIndices: Map<string, number>,
+  strandCount: number,
+): THREE.BufferGeometry {
+  const positions: number[] = [];
+  const normals: number[] = [];
+  const uvs: number[] = [];
+  const colors: number[] = [];
+  const skinIndices: number[] = [];
+  const skinWeights: number[] = [];
+  const indices: number[] = [];
+  const [radiusX, radiusY, radiusZ] = part.radius;
+  const baseColor = new THREE.Color(part.color ?? MATERIAL_COLORS.fur);
+  const saddleColor = new THREE.Color('#626a72');
+  const influenceList = part.boneWeights
+    .filter(([name, weight]) => boneIndices.has(name) && weight > 0)
+    .slice(0, 4);
+  const totalWeight = influenceList.reduce((total, [, weight]) => total + weight, 0) || 1;
+  const normalizedInfluences = influenceList.map(([name, weight]) => [
+    boneIndices.get(name) ?? 0,
+    weight / totalWeight,
+  ] as const);
+
+  let seed = Math.floor(
+    (Math.abs(part.center[0]) * 17.3 +
+      Math.abs(part.center[1]) * 29.7 +
+      Math.abs(part.center[2]) * 43.1 +
+      radiusX * 59.3 +
+      radiusY * 71.9 +
+      radiusZ * 83.7) *
+      1_000_000,
+  ) >>> 0;
+  const random = () => {
+    seed = (seed * 1_664_525 + 1_013_904_223) >>> 0;
+    return seed / 4_294_967_296;
+  };
+  const direction = new THREE.Vector3();
+  const surface = new THREE.Vector3();
+  const normal = new THREE.Vector3();
+  const flow = new THREE.Vector3();
+  const widthAxis = new THREE.Vector3();
+  const baseLeft = new THREE.Vector3();
+  const baseRight = new THREE.Vector3();
+  const tip = new THREE.Vector3();
+  const partRotation = part.rotation;
+
+  for (let strand = 0; strand < strandCount; strand += 1) {
+    const unitY = random() * 2 - 1;
+    const angle = random() * Math.PI * 2;
+    const ring = Math.sqrt(Math.max(0, 1 - unitY * unitY));
+    direction.set(ring * Math.cos(angle), unitY, ring * Math.sin(angle));
+
+    surface.set(direction.x * radiusX, direction.y * radiusY, direction.z * radiusZ);
+    normal.set(direction.x / radiusX, direction.y / radiusY, direction.z / radiusZ).normalize();
+    if (partRotation) {
+      surface.applyQuaternion(partRotation);
+      normal.applyQuaternion(partRotation);
+    }
+    surface.add(new THREE.Vector3(...part.center));
+
+    flow.copy(normal).multiplyScalar(0.78).add(new THREE.Vector3(0, -0.48, 0)).normalize();
+    if (flow.dot(normal) < 0.12) flow.copy(normal);
+    widthAxis.crossVectors(flow, normal);
+    if (widthAxis.lengthSq() < 0.0001) {
+      widthAxis.crossVectors(flow, new THREE.Vector3(1, 0, 0));
+    }
+    widthAxis.normalize().multiplyScalar(0.0018 + random() * 0.003);
+
+    const strandLength = 0.026 + random() * 0.068;
+    baseLeft.copy(surface).sub(widthAxis);
+    baseRight.copy(surface).add(widthAxis);
+    tip.copy(surface).addScaledVector(flow, strandLength);
+
+    const shade = 0.68 + random() * 0.55;
+    const strandColor = baseColor.clone();
+    if (part.saddle) {
+      const silverback =
+        smoothstep(0.12, 0.7, -direction.z) *
+        smoothstep(0.04, 0.45, direction.y) *
+        0.82;
+      strandColor.lerp(saddleColor, silverback);
+    }
+    strandColor.multiplyScalar(shade);
+
+    const firstVertex = positions.length / 3;
+    for (const point of [baseLeft, baseRight, tip]) {
+      positions.push(point.x, point.y, point.z);
+      normals.push(normal.x, normal.y, normal.z);
+      colors.push(strandColor.r, strandColor.g, strandColor.b);
+      for (let slot = 0; slot < 4; slot += 1) {
+        const influence = normalizedInfluences[slot];
+        skinIndices.push(influence?.[0] ?? 0);
+        skinWeights.push(influence?.[1] ?? 0);
+      }
+    }
+    const u = random();
+    uvs.push(u, 0, u + 0.001, 0, u + 0.0005, 1);
+    indices.push(firstVertex, firstVertex + 1, firstVertex + 2);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+  geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+  geometry.setIndex(new THREE.Uint32BufferAttribute(indices, 1));
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
 function addPart(
   parts: GorillaPart[],
   material: MaterialName,
