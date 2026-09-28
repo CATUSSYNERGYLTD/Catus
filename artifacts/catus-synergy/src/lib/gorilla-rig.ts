@@ -270,13 +270,14 @@ function makeFurStrands(
   boneIndices: Map<string, number>,
   strandCount: number,
 ): THREE.BufferGeometry {
-  const positions: number[] = [];
-  const normals: number[] = [];
-  const uvs: number[] = [];
-  const colors: number[] = [];
-  const skinIndices: number[] = [];
-  const skinWeights: number[] = [];
-  const indices: number[] = [];
+  const vertexCount = strandCount * 3;
+  const positions = new Float32Array(vertexCount * 3);
+  const normals = new Float32Array(vertexCount * 3);
+  const uvs = new Float32Array(vertexCount * 2);
+  const colors = new Float32Array(vertexCount * 3);
+  const skinIndices = new Uint16Array(vertexCount * 4);
+  const skinWeights = new Float32Array(vertexCount * 4);
+  const indices = new Uint32Array(strandCount * 3);
   const [radiusX, radiusY, radiusZ] = part.radius;
   const baseColor = new THREE.Color(part.color ?? MATERIAL_COLORS.fur);
   const saddleColor = new THREE.Color('#626a72');
@@ -310,7 +311,12 @@ function makeFurStrands(
   const baseLeft = new THREE.Vector3();
   const baseRight = new THREE.Vector3();
   const tip = new THREE.Vector3();
+  const center = new THREE.Vector3(...part.center);
+  const gravity = new THREE.Vector3(0, -0.48, 0);
+  const fallbackAxis = new THREE.Vector3(1, 0, 0);
+  const strandColor = new THREE.Color();
   const partRotation = part.rotation;
+  let vertexCursor = 0;
 
   for (let strand = 0; strand < strandCount; strand += 1) {
     const unitY = random() * 2 - 1;
@@ -324,13 +330,13 @@ function makeFurStrands(
       surface.applyQuaternion(partRotation);
       normal.applyQuaternion(partRotation);
     }
-    surface.add(new THREE.Vector3(...part.center));
+    surface.add(center);
 
-    flow.copy(normal).multiplyScalar(0.78).add(new THREE.Vector3(0, -0.48, 0)).normalize();
+    flow.copy(normal).multiplyScalar(0.78).add(gravity).normalize();
     if (flow.dot(normal) < 0.12) flow.copy(normal);
     widthAxis.crossVectors(flow, normal);
     if (widthAxis.lengthSq() < 0.0001) {
-      widthAxis.crossVectors(flow, new THREE.Vector3(1, 0, 0));
+      widthAxis.crossVectors(flow, fallbackAxis);
     }
     widthAxis.normalize().multiplyScalar(0.0018 + random() * 0.003);
 
@@ -340,7 +346,7 @@ function makeFurStrands(
     tip.copy(surface).addScaledVector(flow, strandLength);
 
     const shade = 0.68 + random() * 0.55;
-    const strandColor = baseColor.clone();
+    strandColor.copy(baseColor);
     if (part.saddle) {
       const silverback =
         smoothstep(0.12, 0.7, -direction.z) *
@@ -350,30 +356,48 @@ function makeFurStrands(
     }
     strandColor.multiplyScalar(shade);
 
-    const firstVertex = positions.length / 3;
+    const firstVertex = vertexCursor;
     for (const point of [baseLeft, baseRight, tip]) {
-      positions.push(point.x, point.y, point.z);
-      normals.push(normal.x, normal.y, normal.z);
-      colors.push(strandColor.r, strandColor.g, strandColor.b);
+      const vectorOffset = vertexCursor * 3;
+      const uvOffset = vertexCursor * 2;
+      const skinOffset = vertexCursor * 4;
+      positions[vectorOffset] = point.x;
+      positions[vectorOffset + 1] = point.y;
+      positions[vectorOffset + 2] = point.z;
+      normals[vectorOffset] = normal.x;
+      normals[vectorOffset + 1] = normal.y;
+      normals[vectorOffset + 2] = normal.z;
+      colors[vectorOffset] = strandColor.r;
+      colors[vectorOffset + 1] = strandColor.g;
+      colors[vectorOffset + 2] = strandColor.b;
       for (let slot = 0; slot < 4; slot += 1) {
         const influence = normalizedInfluences[slot];
-        skinIndices.push(influence?.[0] ?? 0);
-        skinWeights.push(influence?.[1] ?? 0);
+        skinIndices[skinOffset + slot] = influence?.[0] ?? 0;
+        skinWeights[skinOffset + slot] = influence?.[1] ?? 0;
       }
+      vertexCursor += 1;
     }
     const u = random();
-    uvs.push(u, 0, u + 0.001, 0, u + 0.0005, 1);
-    indices.push(firstVertex, firstVertex + 1, firstVertex + 2);
+    uvs[firstVertex * 2] = u;
+    uvs[firstVertex * 2 + 1] = 0;
+    uvs[(firstVertex + 1) * 2] = u + 0.001;
+    uvs[(firstVertex + 1) * 2 + 1] = 0;
+    uvs[(firstVertex + 2) * 2] = u + 0.0005;
+    uvs[(firstVertex + 2) * 2 + 1] = 1;
+    const indexOffset = strand * 3;
+    indices[indexOffset] = firstVertex;
+    indices[indexOffset + 1] = firstVertex + 1;
+    indices[indexOffset + 2] = firstVertex + 2;
   }
 
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
-  geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
-  geometry.setIndex(new THREE.Uint32BufferAttribute(indices, 1));
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+  geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute('skinIndex', new THREE.BufferAttribute(skinIndices, 4));
+  geometry.setAttribute('skinWeight', new THREE.BufferAttribute(skinWeights, 4));
+  geometry.setIndex(new THREE.BufferAttribute(indices, 1));
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   return geometry;
