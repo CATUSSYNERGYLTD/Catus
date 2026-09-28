@@ -1,0 +1,87 @@
+Create the Catus Synergy parent-company website as a FULL MOTION 3D EXPERIENCE.
+
+The main visual of the hero section must be a FULLY ANIMATED 3D GORILLA.
+
+If the original Catus Synergy logo cannot be converted into a usable 3D animated character, use a suitable professional 3D gorilla character/model and a creature-compatible rigging/animation workflow.
+
+Use a proper gorilla/creature animation tool or pipeline such as Mesh2Motion, Tripo, PINOC, Bake3D, Blender creature rigging, or another suitable tool capable of rigging and animating animals/creatures. These tools support creature rigging/animation workflows. 0
+
+The gorilla must have FULL BODY MOTION.
+
+The gorilla must NOT be a static 3D model with a simple floating effect.
+
+The gorilla must continuously and visibly BREATHE.
+
+BREATHING ANIMATION:
+- chest expands during inhalation
+- chest contracts during exhalation
+- shoulders subtly rise and fall
+- abdomen/chest moves naturally
+- torso responds naturally to breathing
+- breathing continues continuously while the gorilla is idle
+- breathing must be clearly visible to the visitor
+
+FULL GORILLA MOTION:
+- natural idle movement
+- breathing
+- head movement
+- neck movement
+- shoulder movement
+- chest movement
+- arm movement
+- hand movement
+- finger movement where supported
+- body-weight shifting
+- subtle posture adjustments
+- facial movement where supported
+- eye movement where supported
+- natural looking pauses
+- smooth animation loops
+- realistic transitions between movements
+
+The gorilla should feel ALIVE.
+
+The hero should make the visitor feel that a real animated gorilla is standing inside the website.
+
+The animation must be continuous, smooth and cinematic.
+
+Do not create a fake CSS-only gorilla.
+Do not use a static PNG and move it around.
+Do not use a simple 2D image animation.
+Do not use a random cartoon gorilla.
+
+Use an actual rigged 3D gorilla/creature with skeletal animation.
+
+The gorilla should be rendered in real time in the website using a suitable WebGL/3D system such as Three.js/WebGL.
+
+The animation must work interactively inside the browser.
+
+The gorilla should react naturally to:
+- mouse movement
+- cursor position
+- scrolling
+- section transitions
+
+The hero should remain focused on the gorilla.
+
+The Catus Synergy branding should be integrated around the gorilla without preventing the gorilla from being the main visual.
+
+Use the Catus Synergy brand identity:
+Catus Synergy Limited
+"Cooperative Attitude Towards Growth"
+
+The overall website should be a premium parent-company website with the gorilla as the central animated identity.
+
+The priority is:
+
+1. FULL GORILLA ANIMATION
+2. VISIBLE CONTINUOUS BREATHING
+3. NATURAL FULL-BODY MOVEMENT
+4. REAL-TIME 3D INTERACTION
+5. PREMIUM CINEMATIC HERO EXPERIENCE
+6. CATUS SYNERGY BRANDING
+
+Do not simplify the gorilla animation into a basic idle animation.
+
+I specifically want FULL MOTION ANIMATION.
+```1
