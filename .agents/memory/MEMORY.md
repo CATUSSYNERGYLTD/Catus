@@ -1,2 +1,1 @@
 - [WebGL preview limits](webgl-preview.md) — this workspace's screenshot browser may lack WebGL; distinguish its software fallback from the GPU-rendered path.
-- [Gorilla character asset](gorilla-character-asset.md) — use a licensed realistic source model for the Catus hero, not more procedural attempts to imitate the reference.
