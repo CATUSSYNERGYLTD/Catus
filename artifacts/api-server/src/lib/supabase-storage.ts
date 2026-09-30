@@ -62,14 +62,16 @@ export class SupabaseStorageError extends Error {
 
 type StorageConfig = {
   url: string;
-  serviceRoleKey: string;
+  adminKey: string;
 };
 
 function getStorageConfig(): StorageConfig {
   const url = process.env.SUPABASE_URL?.trim().replace(/\/+$/, "");
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const adminKey =
+    process.env.SUPABASE_SECRET_KEY?.trim() ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
-  if (!url || !serviceRoleKey) {
+  if (!url || !adminKey) {
     throw new SupabaseStorageError("Supabase Storage is not configured.", 503);
   }
 
@@ -86,7 +88,7 @@ function getStorageConfig(): StorageConfig {
     throw new SupabaseStorageError("SUPABASE_URL must use HTTPS.", 503);
   }
 
-  return { url, serviceRoleKey };
+  return { url, adminKey };
 }
 
 function storageUrl(config: StorageConfig, path: string): string {
@@ -102,8 +104,8 @@ async function storageRequest(
     return await fetch(storageUrl(config, path), {
       ...init,
       headers: {
-        apikey: config.serviceRoleKey,
-        Authorization: `Bearer ${config.serviceRoleKey}`,
+        apikey: config.adminKey,
+        Authorization: `Bearer ${config.adminKey}`,
         ...init.headers,
       },
     });
