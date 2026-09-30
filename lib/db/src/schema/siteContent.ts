@@ -9,7 +9,7 @@ export const siteContentTable = pgTable("catus_site_content", {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-});
+}).enableRLS();
 
 export const insertSiteContentSchema = createInsertSchema(siteContentTable).omit({
   updatedAt: true,

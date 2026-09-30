@@ -39,6 +39,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 ## Gotchas
 
 - Supabase Postgres currently uses encrypted TLS without certificate verification because its root CA was not supplied. Set `SUPABASE_DATABASE_CA_CERT` to restore peer verification.
+- Declare row-level security with Drizzle `.enableRLS()` on Supabase-backed tables; schema pushes can change the table's RLS state to match the Drizzle definition.
 
 ## Pointers
 

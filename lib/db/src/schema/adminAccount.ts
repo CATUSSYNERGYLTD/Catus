@@ -13,7 +13,7 @@ export const adminAccountTable = pgTable("catus_admin_account", {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-});
+}).enableRLS();
 
 export const insertAdminAccountSchema = createInsertSchema(adminAccountTable).omit({
   createdAt: true,
