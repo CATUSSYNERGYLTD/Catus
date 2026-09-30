@@ -62,19 +62,30 @@ export class SupabaseStorageError extends Error {
 
 type StorageConfig = {
   url: string;
-  adminKey: string;
+  apiKey: string;
+  authorizationToken: string;
 };
 
 function getStorageConfig(): StorageConfig {
   const url = (process.env.SUPABASE_PROJECT_URL || process.env.SUPABASE_URL)
     ?.trim()
     .replace(/\/+$/, "");
-  const adminKey =
+  const legacyServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const apiKey =
     process.env.SUPABASE_SECRET_KEY?.trim() ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+    legacyServiceRoleKey;
+  const authorizationToken = legacyServiceRoleKey?.startsWith("eyJ")
+    ? legacyServiceRoleKey
+    : undefined;
 
-  if (!url || !adminKey) {
+  if (!url || !apiKey) {
     throw new SupabaseStorageError("Supabase Storage is not configured.", 503);
+  }
+  if (!authorizationToken) {
+    throw new SupabaseStorageError(
+      "Supabase Storage admin access requires a service_role JWT in SUPABASE_SERVICE_ROLE_KEY for the Authorization header.",
+      503,
+    );
   }
 
   let parsedUrl: URL;
@@ -90,7 +101,7 @@ function getStorageConfig(): StorageConfig {
     throw new SupabaseStorageError("SUPABASE_URL must use HTTPS.", 503);
   }
 
-  return { url, adminKey };
+  return { url, apiKey, authorizationToken };
 }
 
 function storageUrl(config: StorageConfig, path: string): string {
@@ -106,8 +117,8 @@ async function storageRequest(
     return await fetch(storageUrl(config, path), {
       ...init,
       headers: {
-        apikey: config.adminKey,
-        Authorization: `Bearer ${config.adminKey}`,
+        apikey: config.apiKey,
+        Authorization: `Bearer ${config.authorizationToken}`,
         ...init.headers,
       },
     });
@@ -127,6 +138,10 @@ async function providerError(response: Response, action: string): Promise<Supaba
 async function readBucket(config: StorageConfig): Promise<{ public?: boolean } | null> {
   const response = await storageRequest(config, `/bucket/${encodeURIComponent(bucketId)}`);
   if (response.status === 404) return null;
+  if (response.status === 400) {
+    const body = (await response.clone().json().catch(() => null)) as { code?: string } | null;
+    if (body?.code === "NoSuchBucket") return null;
+  }
   if (!response.ok) throw await providerError(response, "bucket lookup");
   return (await response.json()) as { public?: boolean };
 }
