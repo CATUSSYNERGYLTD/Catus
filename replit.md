@@ -8,8 +8,8 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/db run push` — push schema changes to the configured primary database
+- Required env: `SUPABASE_DATABASE_URL` (primary when set); `DATABASE_URL` is the Replit database fallback
 
 ## Stack
 
@@ -38,7 +38,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Supabase Postgres currently uses encrypted TLS without certificate verification because its root CA was not supplied. Set `SUPABASE_DATABASE_CA_CERT` to restore peer verification.
 
 ## Pointers
 
