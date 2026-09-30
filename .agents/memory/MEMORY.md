@@ -1,3 +1,4 @@
 - [WebGL preview limits](webgl-preview.md) — this workspace's screenshot browser may lack WebGL; distinguish its software fallback from the GPU-rendered path.
 - [Supabase Storage auth](supabase-storage-auth.md) — keep modern Secret API keys in `apikey`; Storage admin routes also need a JWT bearer.
 - [Supabase Postgres TLS](supabase-postgres-tls.md) — verify the database host with its Supabase root CA; encrypted TLS alone does not authenticate it.
+- [Render pnpm builds](render-pnpm.md) — use Render's installed `pnpm` directly; Corepack can fail when its system shim is read-only.
