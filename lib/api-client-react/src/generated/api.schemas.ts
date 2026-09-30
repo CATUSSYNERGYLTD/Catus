@@ -201,3 +201,8 @@ export interface AdminLogoutResponse {
   success: boolean;
 }
 
+export interface AdminImageUploadResponse {
+  url: string;
+  path: string;
+}
+

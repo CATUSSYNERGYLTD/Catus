@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { Router, type IRouter, type Request } from "express";
+import express, { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import {
   ChangeAdminPasswordBody,
   ChangeAdminPasswordResponse,
@@ -10,6 +10,7 @@ import {
   LogoutAdminResponse,
   UpdateSiteContentBody,
   UpdateSiteContentResponse,
+  UploadAdminImageResponse,
 } from "@workspace/api-zod";
 import { adminAccountTable, db, siteContentTable } from "@workspace/db";
 import {
@@ -21,6 +22,13 @@ import {
   setAdminSessionCookie,
   verifyAdminPassword,
 } from "../lib/admin-auth";
+import {
+  isSupportedImageContentType,
+  maxImageUploadBytes,
+  normalizeImageContentType,
+  SupabaseStorageError,
+  uploadPublicSiteImage,
+} from "../lib/supabase-storage";
 
 const router: IRouter = Router();
 const loginWindowMs = 15 * 60 * 1000;
@@ -73,6 +81,79 @@ async function getCurrentAdmin(request: Request) {
     .limit(1);
   return account ?? null;
 }
+
+async function requireContentAdmin(
+  request: Request,
+  response: Response,
+  next: NextFunction,
+): Promise<void> {
+  if (!hasSameOrigin(request)) {
+    response.status(403).json({ error: "Request origin is not allowed." });
+    return;
+  }
+
+  const account = await getCurrentAdmin(request);
+  if (!account) {
+    response.status(401).json({ error: "Admin sign-in required." });
+    return;
+  }
+  if (account.mustChangePassword) {
+    response.status(403).json({ error: "Change the initial password first." });
+    return;
+  }
+
+  next();
+}
+
+router.post(
+  "/admin/images",
+  requireContentAdmin,
+  express.raw({
+    type: (request) => {
+      const contentType = request.headers["content-type"];
+      return isSupportedImageContentType(
+        Array.isArray(contentType) ? contentType[0] : contentType,
+      );
+    },
+    limit: maxImageUploadBytes,
+  }),
+  (error: unknown, _request: Request, response: Response, next: NextFunction) => {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "type" in error &&
+      error.type === "entity.too.large"
+    ) {
+      response.status(413).json({ error: "Images must be 15 MB or smaller." });
+      return;
+    }
+    next(error);
+  },
+  async (request: Request, response: Response): Promise<void> => {
+    const contentType = normalizeImageContentType(request.get("content-type"));
+    if (!isSupportedImageContentType(contentType)) {
+      response.status(415).json({ error: "Choose a JPEG, PNG, WebP, AVIF, or GIF image." });
+      return;
+    }
+    if (!Buffer.isBuffer(request.body) || request.body.length === 0) {
+      response.status(400).json({ error: "Choose an image to upload." });
+      return;
+    }
+
+    try {
+      const result = await uploadPublicSiteImage(request.body, contentType);
+      response.json(UploadAdminImageResponse.parse(result));
+    } catch (error) {
+      const statusCode = error instanceof SupabaseStorageError ? error.statusCode : 502;
+      const message =
+        error instanceof SupabaseStorageError
+          ? error.message
+          : "Image upload failed. Check the Supabase Storage configuration and retry.";
+      request.log.error({ err: error, statusCode }, "Supabase site image upload failed");
+      response.status(statusCode).json({ error: message });
+    }
+  },
+);
 
 router.get("/site-content", async (_request, response): Promise<void> => {
   const [saved] = await db

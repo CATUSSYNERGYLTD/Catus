@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminImageUploadResponse,
   AdminLoginInput,
   AdminLogoutResponse,
   AdminPasswordChangeInput,
@@ -375,6 +376,95 @@ export function useGetAdminStatus<TData = Awaited<ReturnType<typeof getAdminStat
 
 
 
+
+export const getUploadAdminImageUrl = () => {
+
+
+
+
+  return `/api/admin/images`
+}
+
+/**
+ * Accepts an image binary and stores it in the site's public image bucket.
+ * @summary Upload a public site image to Supabase Storage
+ */
+export const uploadAdminImage = async (uploadAdminImageBody: Blob, options?: Parameters<typeof customFetch>[1]): Promise<AdminImageUploadResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AdminImageUploadResponse>(getUploadAdminImageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'image/jpeg', ...getHeaders(options?.headers) },
+    body: uploadAdminImageBody
+  }
+);}
+
+
+
+
+
+export const getUploadAdminImageMutationKey = () => ['uploadAdminImage'] as const;
+
+export const getUploadAdminImageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAdminImage>>, TError,UploadAdminImageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadAdminImage>>, TError,UploadAdminImageMutationVariables, TContext> => {
+
+const mutationKey = getUploadAdminImageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadAdminImage>>, UploadAdminImageMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  uploadAdminImage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadAdminImageMutationResult = NonNullable<Awaited<ReturnType<typeof uploadAdminImage>>>
+    export type UploadAdminImageMutationBody = BodyType<Blob>
+    export type UploadAdminImageMutationError = ErrorType<void>
+    export type UploadAdminImageMutationVariables = {data: BodyType<Blob>}
+
+    /**
+ * @summary Upload a public site image to Supabase Storage
+ */
+export const useUploadAdminImage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAdminImage>>, TError,UploadAdminImageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof uploadAdminImage>>,
+        TError,
+        UploadAdminImageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUploadAdminImageMutationOptions(options));
+    }
 
 export const getLoginAdminUrl = () => {
 

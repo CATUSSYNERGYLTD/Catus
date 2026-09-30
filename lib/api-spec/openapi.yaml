@@ -75,6 +75,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminSession"
+  /admin/images:
+    post:
+      operationId: uploadAdminImage
+      tags: [admin]
+      summary: Upload a public site image to Supabase Storage
+      description: Accepts an image binary and stores it in the site's public image bucket.
+      requestBody:
+        required: true
+        content:
+          image/jpeg:
+            schema: { type: string, format: binary }
+          image/png:
+            schema: { type: string, format: binary }
+          image/webp:
+            schema: { type: string, format: binary }
+          image/avif:
+            schema: { type: string, format: binary }
+          image/gif:
+            schema: { type: string, format: binary }
+      responses:
+        "200":
+          description: Uploaded public image URL and storage path
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminImageUploadResponse"
+        "400":
+          description: Empty or invalid image
+        "401":
+          description: Admin sign-in required
+        "403":
+          description: Admin password change required or request origin is not allowed
+        "413":
+          description: Image exceeds the upload size limit
+        "415":
+          description: Unsupported image type
+        "502":
+          description: Supabase Storage upload failed
+        "503":
+          description: Supabase Storage is not configured
   /admin/login:
     post:
       operationId: loginAdmin
@@ -392,4 +432,11 @@ components:
       properties:
         success: { type: boolean }
       required: [success]
+    AdminImageUploadResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        url: { type: string, format: uri }
+        path: { type: string }
+      required: [url, path]
 

@@ -431,6 +431,16 @@ export const GetAdminStatusResponse = zod.object({
 
 
 /**
+ * Accepts an image binary and stores it in the site's public image bucket.
+ * @summary Upload a public site image to Supabase Storage
+ */
+export const UploadAdminImageResponse = zod.object({
+  "url": zod.string().url(),
+  "path": zod.string()
+})
+
+
+/**
  * @summary Sign in to the admin area
  */
 

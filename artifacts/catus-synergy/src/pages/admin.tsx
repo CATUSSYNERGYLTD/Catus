@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { Form } from '@/components/ui/form';
 import { defaultSiteContent } from '@/lib/default-site-content';
 import {
   getGetAdminStatusQueryKey,
   getGetSiteContentQueryKey,
+  uploadAdminImage,
   useChangeAdminPassword,
   useGetAdminStatus,
   useGetSiteContent,
@@ -13,7 +14,7 @@ import {
   type SiteContent,
   type ServiceItem,
 } from '@workspace/api-client-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { ArrowRight, Check, ChevronRight, CircleAlert, Eye, LayoutDashboard, LogOut, Menu, Plus, Save, ShieldCheck, Sparkles, Trash2, X } from 'lucide-react';
 
@@ -57,6 +58,14 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
+function isImageFieldTestId(testId: string): boolean {
+  return (
+    testId === 'input-brand-logo-path' ||
+    testId === 'input-leadership-portrait' ||
+    /-(image|logo)$/.test(testId)
+  );
+}
+
 function Field({
   label,
   value,
@@ -67,6 +76,7 @@ function Field({
   hint,
   inputType = 'text',
   autoComplete,
+  skipImageUpload = false,
 }: {
   label: string;
   value: string;
@@ -77,7 +87,19 @@ function Field({
   hint?: string;
   inputType?: string;
   autoComplete?: string;
+  skipImageUpload?: boolean;
 }) {
+  if (!skipImageUpload && isImageFieldTestId(testId)) {
+    return (
+      <ImageField
+        label={label.replace(/\s+URL\s*\/\s*path$/i, '')}
+        value={value}
+        onChange={onChange}
+        testId={testId}
+      />
+    );
+  }
+
   return (
     <label className="block space-y-2">
       <span className="flex items-center justify-between gap-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#555d73]">
@@ -105,6 +127,147 @@ function Field({
         />
       )}
     </label>
+  );
+}
+
+const maxImageUploadBytes = 15 * 1024 * 1024;
+const supportedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']);
+
+async function prepareImageForUpload(file: File): Promise<{ blob: Blob; contentType: string }> {
+  const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+  const inferredType: Record<string, string> = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    webp: 'image/webp',
+    avif: 'image/avif',
+    gif: 'image/gif',
+  };
+  const declaredType = file.type.toLowerCase();
+  const contentType =
+    !declaredType || declaredType === 'application/octet-stream'
+      ? inferredType[extension] || declaredType
+      : declaredType;
+  const isHeic =
+    ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'].includes(contentType) ||
+    /\.(heic|heif)$/i.test(file.name);
+
+  if (isHeic) {
+    if (typeof createImageBitmap !== 'function') {
+      throw new Error('This browser cannot convert HEIC photos. Choose a JPEG version of the image.');
+    }
+    let bitmap: ImageBitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+    } catch {
+      throw new Error('This browser cannot read this HEIC photo. Choose a JPEG version of the image.');
+    }
+    try {
+      const scale = Math.min(1, 3200 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('This browser could not prepare the selected photo.');
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(
+          (converted) => converted ? resolve(converted) : reject(new Error('This browser could not convert the selected photo.')),
+          'image/jpeg',
+          0.9,
+        );
+      });
+      return { blob, contentType: 'image/jpeg' };
+    } finally {
+      bitmap.close();
+    }
+  }
+
+  if (!supportedImageTypes.has(contentType)) {
+    throw new Error('Choose a JPEG, PNG, WebP, AVIF, or GIF image. HEIC photos are converted when your browser supports it.');
+  }
+  return { blob: file, contentType };
+}
+
+function ImageField({
+  label,
+  value,
+  onChange,
+  testId,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  testId: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [notice, setNotice] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
+  const upload = useMutation({
+    mutationFn: ({ blob, contentType }: { blob: Blob; contentType: string }) =>
+      uploadAdminImage(blob, { headers: { 'Content-Type': contentType } }),
+  });
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = '';
+    if (!file) return;
+
+    setNotice(null);
+    try {
+      const prepared = await prepareImageForUpload(file);
+      if (prepared.blob.size > maxImageUploadBytes) {
+        throw new Error('Images must be 15 MB or smaller.');
+      }
+      const result = await upload.mutateAsync(prepared);
+      onChange(result.url);
+      setNotice({ tone: 'success', message: 'Image uploaded to Supabase. Save changes to publish it.' });
+    } catch (error) {
+      setNotice({ tone: 'error', message: getErrorMessage(error, 'The image could not be uploaded.') });
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <Field
+        label={`${label} URL / path`}
+        value={value}
+        onChange={(next) => {
+          setNotice(null);
+          onChange(next);
+        }}
+        hint="Paste a public URL or upload from your phone"
+        testId={testId}
+        skipImageUpload
+      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          aria-label={`Choose ${label.toLowerCase()} image from your phone`}
+          data-testid={`input-upload-${testId}`}
+          className="sr-only"
+        />
+        <ActionButton
+          variant="quiet"
+          onClick={() => inputRef.current?.click()}
+          disabled={upload.isPending}
+          testId={`button-upload-${testId}`}
+        >
+          {upload.isPending ? 'Uploading…' : value ? 'Replace image from phone' : 'Choose image from phone'}
+        </ActionButton>
+        {value ? (
+          <img
+            src={value}
+            alt={`Current ${label.toLowerCase()} preview`}
+            className="h-16 w-24 rounded-[2px] border border-[#dfe3eb] bg-white object-contain p-1"
+          />
+        ) : null}
+        <p className="text-xs leading-5 text-[#7b8498]">JPEG, PNG, WebP, AVIF or GIF · max 15 MB. HEIC photos are converted when supported.</p>
+      </div>
+      {notice ? <StatusMessage tone={notice.tone} message={notice.message} testId={`status-${testId}`} /> : null}
+    </div>
   );
 }
 
@@ -241,7 +404,7 @@ function ItemFields({
         <Field label="Description" value={item.description} onChange={(value) => onChange({ ...item, description: value })} multiline testId={`input-${project ? 'project' : 'service'}-${index}-description`} />
       </div>
       <div className="sm:col-span-2">
-        <Field label="Image URL / path" value={item.image} onChange={(value) => onChange({ ...item, image: value })} hint="No upload required" testId={`input-${project ? 'project' : 'service'}-${index}-image`} />
+        <Field label="Image URL / path" value={item.image} onChange={(value) => onChange({ ...item, image: value })} testId={`input-${project ? 'project' : 'service'}-${index}-image`} />
       </div>
       {project ? (
         <label className="flex items-center gap-3 text-sm text-[#4e5870] sm:col-span-2">
@@ -394,7 +557,7 @@ function Overview({ content, onSelect }: { content: SiteContent; onSelect: (sect
       </div>
       <SectionCard eyebrow="Editing rhythm" title="A small, focused system." description="The public site is intentionally edited as one content source. Work section by section, then save once when the complete page is ready.">
         <div className="grid gap-5 md:grid-cols-3">
-          {[['01', 'Shape the message', 'Use the left rail to move through the public page in its natural order.'], ['02', 'Keep the details useful', 'Image fields accept the existing paths or any public URL. No asset upload is needed.'], ['03', 'Save the whole snapshot', 'One save replaces the complete public content record, so nothing is left half-published.']].map(([number, title, copy]) => <div key={number} className="border-l-2 border-[#1f3fb7] pl-4"><span className="font-mono-brand text-[10px] text-[#1f3fb7]">{number}</span><h3 className="mt-3 text-sm font-semibold text-[#172039]">{title}</h3><p className="mt-2 text-sm leading-6 text-[#697186]">{copy}</p></div>)}
+          {[['01', 'Shape the message', 'Use the left rail to move through the public page in its natural order.'], ['02', 'Keep the details useful', 'Upload images from your phone or paste a public URL.'], ['03', 'Save the whole snapshot', 'One save replaces the complete public content record, so nothing is left half-published.']].map(([number, title, copy]) => <div key={number} className="border-l-2 border-[#1f3fb7] pl-4"><span className="font-mono-brand text-[10px] text-[#1f3fb7]">{number}</span><h3 className="mt-3 text-sm font-semibold text-[#172039]">{title}</h3><p className="mt-2 text-sm leading-6 text-[#697186]">{copy}</p></div>)}
         </div>
       </SectionCard>
     </div>
