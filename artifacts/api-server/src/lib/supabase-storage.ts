@@ -149,12 +149,10 @@ async function ensurePublicBucket(config: StorageConfig): Promise<void> {
   }
 
   if (!bucket.public) {
-    const response = await storageRequest(config, `/bucket/${encodeURIComponent(bucketId)}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bucketSettings),
-    });
-    if (!response.ok) throw await providerError(response, "bucket configuration");
+    throw new SupabaseStorageError(
+      `The ${bucketId} bucket already exists but is private. Make it public in Supabase Storage or rename it before uploading.`,
+      503,
+    );
   }
 }
 
