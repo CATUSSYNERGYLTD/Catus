@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: site-content
+    description: Public website content and protected admin editing
+  - name: admin
+    description: Admin sign-in and account management
 paths:
   /healthz:
     get:
@@ -24,6 +28,111 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /site-content:
+    get:
+      operationId: getSiteContent
+      tags: [site-content]
+      summary: Get the published website content
+      responses:
+        "200":
+          description: Website content, or null before the first admin save
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteContentSnapshot"
+    put:
+      operationId: updateSiteContent
+      tags: [site-content]
+      summary: Replace the website content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteContentWriteInput"
+      responses:
+        "200":
+          description: Updated website content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteContentSnapshot"
+        "400":
+          description: Invalid website content
+        "401":
+          description: Admin sign-in required
+        "403":
+          description: Admin password change required
+  /admin/status:
+    get:
+      operationId: getAdminStatus
+      tags: [admin]
+      summary: Get the current admin session state
+      responses:
+        "200":
+          description: Current session state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+  /admin/login:
+    post:
+      operationId: loginAdmin
+      tags: [admin]
+      summary: Sign in to the admin area
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          description: Credentials were not accepted
+        "429":
+          description: Too many sign-in attempts
+        "503":
+          description: Admin password is not configured
+  /admin/logout:
+    post:
+      operationId: logoutAdmin
+      tags: [admin]
+      summary: End the current admin session
+      responses:
+        "200":
+          description: Signed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminLogoutResponse"
+  /admin/password:
+    post:
+      operationId: changeAdminPassword
+      tags: [admin]
+      summary: Change the admin password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminPasswordChangeInput"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "400":
+          description: Password does not meet the requirements
+        "401":
+          description: Admin sign-in required
 components:
   schemas:
     HealthStatus:
@@ -33,4 +142,254 @@ components:
           type: string
       required:
         - status
+    NavItem:
+      type: object
+      additionalProperties: false
+      properties:
+        label: { type: string }
+        href: { type: string }
+      required: [label, href]
+    HeroSlide:
+      type: object
+      additionalProperties: false
+      properties:
+        eyebrow: { type: string }
+        headlineFirst: { type: string }
+        headlineSecond: { type: string }
+        description: { type: string }
+        image: { type: string }
+      required: [eyebrow, headlineFirst, headlineSecond, description, image]
+    ServiceItem:
+      type: object
+      additionalProperties: false
+      properties:
+        title: { type: string }
+        kicker: { type: string }
+        description: { type: string }
+        image: { type: string }
+      required: [title, kicker, description, image]
+    ProjectItem:
+      type: object
+      additionalProperties: false
+      properties:
+        title: { type: string }
+        category: { type: string }
+        location: { type: string }
+        description: { type: string }
+        image: { type: string }
+        illustrative: { type: boolean }
+      required: [title, category, location, description, image, illustrative]
+    ApproachStep:
+      type: object
+      additionalProperties: false
+      properties:
+        number: { type: string }
+        title: { type: string }
+        copy: { type: string }
+      required: [number, title, copy]
+    PartnerItem:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string }
+        logo: { type: string }
+        url: { type: string }
+      required: [name, logo, url]
+    SiteContent:
+      type: object
+      additionalProperties: false
+      properties:
+        brand:
+          type: object
+          additionalProperties: false
+          properties:
+            companyName: { type: string }
+            tagline: { type: string }
+            logoPath: { type: string }
+          required: [companyName, tagline, logoPath]
+        navigation:
+          type: array
+          items: { $ref: "#/components/schemas/NavItem" }
+        headerCta: { type: string }
+        hero:
+          type: object
+          additionalProperties: false
+          properties:
+            locationLabel: { type: string }
+            watermark: { type: string }
+            footerLabel: { type: string }
+            primaryCta: { type: string }
+            secondaryCta: { type: string }
+            pauseLabel: { type: string }
+            playLabel: { type: string }
+            slides:
+              type: array
+              items: { $ref: "#/components/schemas/HeroSlide" }
+          required: [locationLabel, watermark, footerLabel, primaryCta, secondaryCta, pauseLabel, playLabel, slides]
+        about:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            leftNote: { type: string }
+            titleFirst: { type: string }
+            titleSecond: { type: string }
+            body: { type: string }
+            supportingCopy: { type: string }
+            cta: { type: string }
+          required: [eyebrow, leftNote, titleFirst, titleSecond, body, supportingCopy, cta]
+        services:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            titleEmphasis: { type: string }
+            note: { type: string }
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ServiceItem" }
+          required: [eyebrow, title, titleEmphasis, note, items]
+        businesses:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            titleEmphasis: { type: string }
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ServiceItem" }
+          required: [eyebrow, title, titleEmphasis, items]
+        projects:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            titleEmphasis: { type: string }
+            note: { type: string }
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ProjectItem" }
+          required: [eyebrow, title, titleEmphasis, note, items]
+        approach:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            titleEmphasis: { type: string }
+            intro: { type: string }
+            steps:
+              type: array
+              items: { $ref: "#/components/schemas/ApproachStep" }
+          required: [eyebrow, title, titleEmphasis, intro, steps]
+        partners:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            titleEmphasis: { type: string }
+            note: { type: string }
+            emptyMessage: { type: string }
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/PartnerItem" }
+          required: [eyebrow, title, titleEmphasis, note, emptyMessage, items]
+        values:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            titleEmphasis: { type: string }
+            intro: { type: string }
+            items:
+              type: array
+              items: { type: string }
+          required: [eyebrow, title, titleEmphasis, intro, items]
+        leadership:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            titleEmphasis: { type: string }
+            name: { type: string }
+            role: { type: string }
+            portraitUrl: { type: string }
+            statement: { type: string }
+          required: [eyebrow, title, titleEmphasis, name, role, portraitUrl, statement]
+        contact:
+          type: object
+          additionalProperties: false
+          properties:
+            eyebrow: { type: string }
+            headline: { type: string }
+            email: { type: string }
+            phone: { type: string }
+            location: { type: string }
+            socialHandle: { type: string }
+            socialUrl: { type: string }
+            cta: { type: string }
+          required: [eyebrow, headline, email, phone, location, socialHandle, socialUrl, cta]
+        footer:
+          type: object
+          additionalProperties: false
+          properties:
+            tagline: { type: string }
+            navigateLabel: { type: string }
+            contactLabel: { type: string }
+          required: [tagline, navigateLabel, contactLabel]
+      required: [brand, navigation, headerCta, hero, about, services, businesses, projects, approach, partners, values, leadership, contact, footer]
+    SiteContentWriteInput:
+      type: object
+      additionalProperties: false
+      properties:
+        content: { $ref: "#/components/schemas/SiteContent" }
+      required: [content]
+    SiteContentSnapshot:
+      type: object
+      additionalProperties: false
+      properties:
+        content:
+          oneOf:
+            - $ref: "#/components/schemas/SiteContent"
+            - type: "null"
+        updatedAt:
+          type: ["string", "null"]
+          format: date-time
+      required: [content, updatedAt]
+    AdminLoginInput:
+      type: object
+      additionalProperties: false
+      properties:
+        username: { type: string, minLength: 1 }
+        password: { type: string, minLength: 1 }
+      required: [username, password]
+    AdminPasswordChangeInput:
+      type: object
+      additionalProperties: false
+      properties:
+        newPassword: { type: string, minLength: 12 }
+      required: [newPassword]
+    AdminSession:
+      type: object
+      additionalProperties: false
+      properties:
+        authenticated: { type: boolean }
+        username:
+          oneOf:
+            - type: string
+            - type: "null"
+        mustChangePassword: { type: boolean }
+      required: [authenticated, username, mustChangePassword]
+    AdminLogoutResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        success: { type: boolean }
+      required: [success]
 
