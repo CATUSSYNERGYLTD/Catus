@@ -4,7 +4,7 @@ export const defaultSiteContent: SiteContent = {
   brand: {
     companyName: "Catus Synergy Limited",
     tagline: "Cooperative Attitude Towards Growth",
-    logoPath: "/brand/catus-synergy-wordmark-cropped.png",
+    logoPath: "/brand/catus-synergy-wordmark-white.png",
   },
   navigation: [
     { label: "Home", href: "#home" },

@@ -32,14 +32,20 @@ function safeImageSrc(value: string): string | undefined {
 }
 
 function BrandWordmark({ compact = false, src, companyName }: { compact?: boolean; src: string; companyName: string }) {
-  return (
+  const wordmark = (
     <img
       src={safeImageSrc(src) ?? defaultSiteContent.brand.logoPath}
       alt={companyName}
-      className={compact ? 'wordmark-crop h-11 w-[120px]' : 'wordmark-crop h-14 w-[140px]'}
+      className={compact ? 'wordmark-crop h-full w-full' : 'wordmark-crop h-14 w-[140px]'}
       data-testid={compact ? 'img-wordmark-header' : 'img-wordmark-footer'}
     />
   );
+
+  return compact ? (
+    <span className="inline-flex h-11 w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-[2px] bg-[#0000ad] px-1">
+      {wordmark}
+    </span>
+  ) : wordmark;
 }
 
 function Header({ content, menuOpen, setMenuOpen }: { content: SiteContent; menuOpen: boolean; setMenuOpen: (open: boolean) => void }) {

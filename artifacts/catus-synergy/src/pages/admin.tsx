@@ -282,7 +282,7 @@ function LoginView({ onLoggedIn }: { onLoggedIn: () => void }) {
           <div className="absolute -bottom-24 -left-16 h-96 w-96 rounded-full border border-[#aebeff]/20" />
           <div className="relative flex h-full flex-col justify-between">
             <div>
-              <img src="/brand/catus-synergy-wordmark-cropped.png" alt="Catus Synergy Limited" className="h-16 w-[180px] object-contain object-left" data-testid="img-admin-login-wordmark" />
+              <img src="/brand/catus-synergy-wordmark-white.png" alt="Catus Synergy Limited" className="h-16 w-[180px] object-contain object-left" data-testid="img-admin-login-wordmark" />
               <p className="display mt-16 max-w-[310px] text-5xl leading-[0.98] tracking-[-0.06em]">The quiet room behind the public face.</p>
             </div>
             <div className="border-t border-white/20 pt-5">
