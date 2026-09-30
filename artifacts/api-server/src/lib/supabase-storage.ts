@@ -66,7 +66,9 @@ type StorageConfig = {
 };
 
 function getStorageConfig(): StorageConfig {
-  const url = process.env.SUPABASE_URL?.trim().replace(/\/+$/, "");
+  const url = (process.env.SUPABASE_PROJECT_URL || process.env.SUPABASE_URL)
+    ?.trim()
+    .replace(/\/+$/, "");
   const adminKey =
     process.env.SUPABASE_SECRET_KEY?.trim() ||
     process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
