@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { Form } from '@/components/ui/form';
+import AdminEmail from '@/components/admin-email';
+import { AdminInstallButton } from '@/components/admin-install-button';
 import { defaultSiteContent } from '@/lib/default-site-content';
 import {
   getGetAdminStatusQueryKey,
@@ -31,7 +33,8 @@ type SectionKey =
   | 'values'
   | 'leadership'
   | 'contact'
-  | 'footer';
+  | 'footer'
+  | 'email';
 
 type LoginValues = { username: string; password: string };
 type PasswordValues = { newPassword: string; confirmPassword: string };
@@ -50,6 +53,7 @@ const sections: { key: SectionKey; label: string; detail: string }[] = [
   { key: 'leadership', label: 'Leadership', detail: 'Point of view' },
   { key: 'contact', label: 'Contact', detail: 'Start a conversation' },
   { key: 'footer', label: 'Footer', detail: 'Closing frame' },
+  { key: 'email', label: 'Company email', detail: 'Inbox & replies' },
 ];
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -627,7 +631,7 @@ function EditorShell({ initialContent, username, onLogout }: { initialContent: S
             <button type="button" onClick={() => setMobileNav(!mobileNav)} aria-label={mobileNav ? 'Close section menu' : 'Open section menu'} data-testid="button-toggle-admin-menu" className="inline-flex h-10 w-10 items-center justify-center border border-[#d5dae5] bg-[#fffefe] text-[#1f3fb7] lg:hidden">{mobileNav ? <X size={17} /> : <Menu size={17} />}</button>
             <div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center bg-[#162675] text-white"><Sparkles size={15} /></div><div><p className="display text-[21px] leading-none tracking-[-0.05em] text-[#172039]">Catus Synergy</p><p className="mt-1 font-mono-brand text-[8px] uppercase tracking-[0.16em] text-[#778198]">Content room</p></div></div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4"><div className="hidden items-center gap-2 text-xs text-[#697186] sm:flex"><span className="h-2 w-2 rounded-full bg-[#3e9a68]" />Signed in as <strong className="font-medium text-[#35405b]">{username ?? 'operator'}</strong></div><a href="/" target="_blank" rel="noreferrer" data-testid="link-view-public-site" className="inline-flex h-10 items-center gap-2 border border-[#d5dae5] bg-[#fffefe] px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#35405b] hover:border-[#9eadd1]"><Eye size={14} /> <span className="hidden sm:inline">View site</span></a><ActionButton onClick={signOut} disabled={logout.isPending} variant="quiet" testId="button-admin-logout"><LogOut size={14} /><span className="hidden sm:inline">Sign out</span></ActionButton></div>
+          <div className="flex items-center gap-2 sm:gap-4"><div className="hidden items-center gap-2 text-xs text-[#697186] sm:flex"><span className="h-2 w-2 rounded-full bg-[#3e9a68]" />Signed in as <strong className="font-medium text-[#35405b]">{username ?? 'operator'}</strong></div><AdminInstallButton /><a href="/" target="_blank" rel="noreferrer" data-testid="link-view-public-site" className="inline-flex h-10 items-center gap-2 border border-[#d5dae5] bg-[#fffefe] px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#35405b] hover:border-[#9eadd1]"><Eye size={14} /> <span className="hidden sm:inline">View site</span></a><ActionButton onClick={signOut} disabled={logout.isPending} variant="quiet" testId="button-admin-logout"><LogOut size={14} /><span className="hidden sm:inline">Sign out</span></ActionButton></div>
         </div>
       </header>
       <div className="mx-auto flex max-w-[1600px]">
@@ -639,9 +643,9 @@ function EditorShell({ initialContent, username, onLogout }: { initialContent: S
         </aside>
         <main className="min-w-0 flex-1 px-5 py-7 sm:px-8 sm:py-10 lg:px-12 xl:px-16">
           <div className="mx-auto max-w-[1040px]">
-            <div className="mb-8 flex flex-col justify-between gap-5 border-b border-[#d9dee8] pb-6 sm:flex-row sm:items-end"><div><div className="flex items-center gap-2 font-mono-brand text-[10px] uppercase tracking-[0.15em] text-[#8a92a4]"><LayoutDashboard size={13} className="text-[#1f3fb7]" /> Admin / <span className="text-[#1f3fb7]">{active.label}</span></div><h1 className="display mt-3 text-[clamp(2.2rem,5vw,4rem)] leading-none tracking-[-0.06em] text-[#172039]">{active.label}</h1></div><div className="flex items-center gap-3"><span className={`text-xs ${dirty ? 'text-[#a06a32]' : 'text-[#6b8a76]'}`}>{dirty ? 'Unsaved changes' : 'All changes saved'}</span><ActionButton onClick={save} disabled={!dirty || update.isPending} testId="button-save-content"><Save size={14} />{update.isPending ? 'Saving…' : 'Save changes'}</ActionButton></div></div>
+            <div className="mb-8 flex flex-col justify-between gap-5 border-b border-[#d9dee8] pb-6 sm:flex-row sm:items-end"><div><div className="flex items-center gap-2 font-mono-brand text-[10px] uppercase tracking-[0.15em] text-[#8a92a4]"><LayoutDashboard size={13} className="text-[#1f3fb7]" /> Admin / <span className="text-[#1f3fb7]">{active.label}</span></div><h1 className="display mt-3 text-[clamp(2.2rem,5vw,4rem)] leading-none tracking-[-0.06em] text-[#172039]">{active.label}</h1></div>{section === 'email' ? <p className="max-w-sm text-xs leading-5 text-[#697186]">Connect the company mailbox to read, reply to, and send email.</p> : <div className="flex items-center gap-3"><span className={`text-xs ${dirty ? 'text-[#a06a32]' : 'text-[#6b8a76]'}`}>{dirty ? 'Unsaved changes' : 'All changes saved'}</span><ActionButton onClick={save} disabled={!dirty || update.isPending} testId="button-save-content"><Save size={14} />{update.isPending ? 'Saving…' : 'Save changes'}</ActionButton></div>}</div>
             {notice ? <div className="mb-6"><StatusMessage tone={notice.tone} message={notice.message} testId={`status-content-${notice.tone}`} /></div> : null}
-            <ContentEditor section={section} content={content} setContent={setContent} onSelect={changeSection} />
+            {section === 'email' ? <AdminEmail /> : <ContentEditor section={section} content={content} setContent={setContent} onSelect={changeSection} />}
             {section === 'overview' ? <div className="mt-6 flex justify-end"><ActionButton onClick={save} disabled={!dirty || update.isPending} testId="button-save-overview"><Save size={14} /> Save changes</ActionButton></div> : null}
           </div>
         </main>

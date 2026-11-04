@@ -206,3 +206,121 @@ export interface AdminImageUploadResponse {
   path: string;
 }
 
+export interface AdminMailbox {
+  connected: boolean;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  imapHost: string | null;
+  /** @nullable */
+  imapPort: number | null;
+  /** @nullable */
+  smtpHost: string | null;
+  /** @nullable */
+  smtpPort: number | null;
+  /** @nullable */
+  connectedAt: string | null;
+}
+
+export type AdminMailboxConnectInputImapPort = typeof AdminMailboxConnectInputImapPort[keyof typeof AdminMailboxConnectInputImapPort];
+
+
+export const AdminMailboxConnectInputImapPort = {
+  NUMBER_993: 993,
+  NUMBER_143: 143,
+} as const;
+
+export type AdminMailboxConnectInputSmtpPort = typeof AdminMailboxConnectInputSmtpPort[keyof typeof AdminMailboxConnectInputSmtpPort];
+
+
+export const AdminMailboxConnectInputSmtpPort = {
+  NUMBER_465: 465,
+  NUMBER_587: 587,
+} as const;
+
+export interface AdminMailboxConnectInput {
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 1024
+     */
+  password: string;
+  /**
+     * @minLength 1
+     * @maxLength 253
+     */
+  imapHost: string;
+  imapPort: AdminMailboxConnectInputImapPort;
+  /**
+     * @minLength 1
+     * @maxLength 253
+     */
+  smtpHost: string;
+  smtpPort: AdminMailboxConnectInputSmtpPort;
+}
+
+export interface AdminMailboxDisconnectResponse {
+  success: boolean;
+}
+
+export interface AdminMailboxMessageSummary {
+  /** @minimum 1 */
+  uid: number;
+  from: string;
+  /** @nullable */
+  fromName: string | null;
+  to: string;
+  subject: string;
+  /** @nullable */
+  date: string | null;
+  preview: string;
+  unread: boolean;
+}
+
+export type AdminMailboxMessage = AdminMailboxMessageSummary & ({
+  bodyText: string;
+  /** @nullable */
+  messageId: string | null;
+});
+
+export interface AdminMailboxMessageList {
+  connected: boolean;
+  /** @nullable */
+  email: string | null;
+  messages: AdminMailboxMessageSummary[];
+}
+
+export interface AdminMailboxMessageDetail {
+  message: AdminMailboxMessage;
+}
+
+export interface AdminMailboxSendInput {
+  to: string;
+  /**
+     * @minLength 1
+     * @maxLength 250
+     */
+  subject: string;
+  /**
+     * @minLength 1
+     * @maxLength 30000
+     */
+  text: string;
+  /** @minimum 1 */
+  replyToUid?: number;
+}
+
+export interface AdminMailboxSendResponse {
+  success: boolean;
+  recipient: string;
+  sentAt: string;
+}
+
+export type ListAdminMailboxMessagesParams = {
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+limit?: number;
+};
+

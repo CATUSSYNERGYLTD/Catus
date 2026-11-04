@@ -82,7 +82,7 @@ async function getCurrentAdmin(request: Request) {
   return account ?? null;
 }
 
-async function requireContentAdmin(
+export async function requireContentAdmin(
   request: Request,
   response: Response,
   next: NextFunction,

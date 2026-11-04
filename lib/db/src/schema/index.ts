@@ -19,3 +19,4 @@
 
 export * from "./siteContent";
 export * from "./adminAccount";
+export * from "./adminMailbox";

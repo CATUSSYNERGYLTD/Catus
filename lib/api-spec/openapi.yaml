@@ -173,6 +173,129 @@ paths:
           description: Password does not meet the requirements
         "401":
           description: Admin sign-in required
+  /admin/mailbox:
+    get:
+      operationId: getAdminMailbox
+      tags: [admin]
+      summary: Get the connected company mailbox
+      responses:
+        "200":
+          description: Mailbox status without credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMailbox"
+        "401":
+          description: Admin sign-in required
+    post:
+      operationId: connectAdminMailbox
+      tags: [admin]
+      summary: Connect a Go45 IMAP and SMTP mailbox
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminMailboxConnectInput"
+      responses:
+        "200":
+          description: Connected mailbox status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMailbox"
+        "400":
+          description: Invalid mailbox settings
+        "401":
+          description: Admin sign-in required
+        "502":
+          description: Mailbox could not be verified
+    delete:
+      operationId: disconnectAdminMailbox
+      tags: [admin]
+      summary: Disconnect the company mailbox
+      responses:
+        "200":
+          description: Mailbox disconnected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMailboxDisconnectResponse"
+        "401":
+          description: Admin sign-in required
+  /admin/mailbox/messages:
+    get:
+      operationId: listAdminMailboxMessages
+      tags: [admin]
+      summary: List recent inbox messages
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 30 }
+      responses:
+        "200":
+          description: Recent inbox messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMailboxMessageList"
+        "401":
+          description: Admin sign-in required
+        "503":
+          description: No mailbox is connected
+        "502":
+          description: Inbox could not be loaded
+  /admin/mailbox/messages/{uid}:
+    get:
+      operationId: getAdminMailboxMessage
+      tags: [admin]
+      summary: Read one inbox message
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Message details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMailboxMessageDetail"
+        "401":
+          description: Admin sign-in required
+        "404":
+          description: Message not found
+        "503":
+          description: No mailbox is connected
+        "502":
+          description: Message could not be loaded
+  /admin/mailbox/send:
+    post:
+      operationId: sendAdminMailboxMessage
+      tags: [admin]
+      summary: Send or reply from the company mailbox
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminMailboxSendInput"
+      responses:
+        "200":
+          description: Email sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMailboxSendResponse"
+        "400":
+          description: Invalid message
+        "401":
+          description: Admin sign-in required
+        "503":
+          description: No mailbox is connected
+        "502":
+          description: Email could not be sent
 components:
   schemas:
     HealthStatus:
@@ -439,4 +562,88 @@ components:
         url: { type: string, format: uri }
         path: { type: string }
       required: [url, path]
+    AdminMailbox:
+      type: object
+      additionalProperties: false
+      properties:
+        connected: { type: boolean }
+        email: { type: ["string", "null"], format: email }
+        imapHost: { type: ["string", "null"] }
+        imapPort: { type: ["integer", "null"] }
+        smtpHost: { type: ["string", "null"] }
+        smtpPort: { type: ["integer", "null"] }
+        connectedAt: { type: ["string", "null"], format: date-time }
+      required: [connected, email, imapHost, imapPort, smtpHost, smtpPort, connectedAt]
+    AdminMailboxConnectInput:
+      type: object
+      additionalProperties: false
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1, maxLength: 1024 }
+        imapHost: { type: string, minLength: 1, maxLength: 253 }
+        imapPort: { type: integer, enum: [993, 143] }
+        smtpHost: { type: string, minLength: 1, maxLength: 253 }
+        smtpPort: { type: integer, enum: [465, 587] }
+      required: [email, password, imapHost, imapPort, smtpHost, smtpPort]
+    AdminMailboxDisconnectResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        success: { type: boolean }
+      required: [success]
+    AdminMailboxMessageSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        uid: { type: integer, minimum: 1 }
+        from: { type: string }
+        fromName: { type: ["string", "null"] }
+        to: { type: string }
+        subject: { type: string }
+        date: { type: ["string", "null"], format: date-time }
+        preview: { type: string }
+        unread: { type: boolean }
+      required: [uid, from, fromName, to, subject, date, preview, unread]
+    AdminMailboxMessage:
+      allOf:
+        - $ref: "#/components/schemas/AdminMailboxMessageSummary"
+        - type: object
+          additionalProperties: false
+          properties:
+            bodyText: { type: string }
+            messageId: { type: ["string", "null"] }
+          required: [bodyText, messageId]
+    AdminMailboxMessageList:
+      type: object
+      additionalProperties: false
+      properties:
+        connected: { type: boolean }
+        email: { type: ["string", "null"], format: email }
+        messages:
+          type: array
+          items: { $ref: "#/components/schemas/AdminMailboxMessageSummary" }
+      required: [connected, email, messages]
+    AdminMailboxMessageDetail:
+      type: object
+      additionalProperties: false
+      properties:
+        message: { $ref: "#/components/schemas/AdminMailboxMessage" }
+      required: [message]
+    AdminMailboxSendInput:
+      type: object
+      additionalProperties: false
+      properties:
+        to: { type: string, format: email }
+        subject: { type: string, minLength: 1, maxLength: 250 }
+        text: { type: string, minLength: 1, maxLength: 30000 }
+        replyToUid: { type: integer, minimum: 1 }
+      required: [to, subject, text]
+    AdminMailboxSendResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        success: { type: boolean }
+        recipient: { type: string, format: email }
+        sentAt: { type: string, format: date-time }
+      required: [success, recipient, sentAt]
 

@@ -485,3 +485,141 @@ export const ChangeAdminPasswordResponse = zod.object({
 })
 
 
+/**
+ * @summary Get the connected company mailbox
+ */
+export const GetAdminMailboxResponse = zod.object({
+  "connected": zod.boolean(),
+  "email": zod.string().email().nullable(),
+  "imapHost": zod.string().nullable(),
+  "imapPort": zod.number().int().nullable(),
+  "smtpHost": zod.string().nullable(),
+  "smtpPort": zod.number().int().nullable(),
+  "connectedAt": zod.coerce.date().nullable()
+})
+
+
+/**
+ * @summary Connect a Go45 IMAP and SMTP mailbox
+ */
+export const connectAdminMailboxBodyPasswordMax = 1024;
+
+export const connectAdminMailboxBodyImapHostMax = 253;
+
+export const connectAdminMailboxBodySmtpHostMax = 253;
+
+
+
+export const ConnectAdminMailboxBody = zod.object({
+  "email": zod.string().email(),
+  "password": zod.string().min(1).max(connectAdminMailboxBodyPasswordMax),
+  "imapHost": zod.string().min(1).max(connectAdminMailboxBodyImapHostMax),
+  "imapPort": zod.union([zod.literal(993),zod.literal(143)]),
+  "smtpHost": zod.string().min(1).max(connectAdminMailboxBodySmtpHostMax),
+  "smtpPort": zod.union([zod.literal(465),zod.literal(587)])
+})
+
+export const ConnectAdminMailboxResponse = zod.object({
+  "connected": zod.boolean(),
+  "email": zod.string().email().nullable(),
+  "imapHost": zod.string().nullable(),
+  "imapPort": zod.number().int().nullable(),
+  "smtpHost": zod.string().nullable(),
+  "smtpPort": zod.number().int().nullable(),
+  "connectedAt": zod.coerce.date().nullable()
+})
+
+
+/**
+ * @summary Disconnect the company mailbox
+ */
+export const DisconnectAdminMailboxResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary List recent inbox messages
+ */
+export const listAdminMailboxMessagesQueryLimitDefault = 30;
+export const listAdminMailboxMessagesQueryLimitMax = 50;
+
+
+
+export const ListAdminMailboxMessagesQueryParams = zod.object({
+  "limit": zod.coerce.number().int().min(1).max(listAdminMailboxMessagesQueryLimitMax).default(listAdminMailboxMessagesQueryLimitDefault)
+})
+
+
+
+
+export const ListAdminMailboxMessagesResponse = zod.object({
+  "connected": zod.boolean(),
+  "email": zod.string().email().nullable(),
+  "messages": zod.array(zod.object({
+  "uid": zod.number().int().min(1),
+  "from": zod.string(),
+  "fromName": zod.string().nullable(),
+  "to": zod.string(),
+  "subject": zod.string(),
+  "date": zod.coerce.date().nullable(),
+  "preview": zod.string(),
+  "unread": zod.boolean()
+}))
+})
+
+
+/**
+ * @summary Read one inbox message
+ */
+
+
+
+export const GetAdminMailboxMessageParams = zod.object({
+  "uid": zod.coerce.number().int().min(1)
+})
+
+
+
+
+export const GetAdminMailboxMessageResponse = zod.object({
+  "message": zod.object({
+  "uid": zod.number().int().min(1),
+  "from": zod.string(),
+  "fromName": zod.string().nullable(),
+  "to": zod.string(),
+  "subject": zod.string(),
+  "date": zod.coerce.date().nullable(),
+  "preview": zod.string(),
+  "unread": zod.boolean()
+}).and(zod.object({
+  "bodyText": zod.string(),
+  "messageId": zod.string().nullable()
+}))
+})
+
+
+/**
+ * @summary Send or reply from the company mailbox
+ */
+export const sendAdminMailboxMessageBodySubjectMax = 250;
+
+export const sendAdminMailboxMessageBodyTextMax = 30000;
+
+
+
+
+export const SendAdminMailboxMessageBody = zod.object({
+  "to": zod.string().email(),
+  "subject": zod.string().min(1).max(sendAdminMailboxMessageBodySubjectMax),
+  "text": zod.string().min(1).max(sendAdminMailboxMessageBodyTextMax),
+  "replyToUid": zod.number().int().min(1).optional()
+})
+
+export const SendAdminMailboxMessageResponse = zod.object({
+  "success": zod.boolean(),
+  "recipient": zod.string().email(),
+  "sentAt": zod.coerce.date()
+})
+
+

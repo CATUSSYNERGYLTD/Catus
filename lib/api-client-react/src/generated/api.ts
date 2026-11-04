@@ -28,9 +28,17 @@ import type {
   AdminImageUploadResponse,
   AdminLoginInput,
   AdminLogoutResponse,
+  AdminMailbox,
+  AdminMailboxConnectInput,
+  AdminMailboxDisconnectResponse,
+  AdminMailboxMessageDetail,
+  AdminMailboxMessageList,
+  AdminMailboxSendInput,
+  AdminMailboxSendResponse,
   AdminPasswordChangeInput,
   AdminSession,
   HealthStatus,
+  ListAdminMailboxMessagesParams,
   SiteContentSnapshot,
   SiteContentWriteInput
 } from './api.schemas';
@@ -791,5 +799,565 @@ export const useChangeAdminPassword = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getChangeAdminPasswordMutationOptions(options), queryClient);
+    }
+
+export const getGetAdminMailboxUrl = () => {
+
+
+
+
+  return `/api/admin/mailbox`
+}
+
+/**
+ * @summary Get the connected company mailbox
+ */
+export const getAdminMailbox = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminMailbox> => {
+
+  return customFetch<AdminMailbox>(getGetAdminMailboxUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminMailboxQueryKey = () => {
+    return [
+    `/api/admin/mailbox`
+    ] as const;
+    }
+
+
+export const getGetAdminMailboxQueryOptions = <TData = Awaited<ReturnType<typeof getAdminMailbox>>, TError = ErrorType<void>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminMailboxQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminMailbox>>> = ({ signal }) => getAdminMailbox({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminMailbox>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdminMailboxQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminMailbox>>>
+export type GetAdminMailboxQueryError = ErrorType<void>
+
+
+export function useGetAdminMailbox<TData = Awaited<ReturnType<typeof getAdminMailbox>>, TError = ErrorType<void>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailbox>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminMailbox>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminMailbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminMailbox<TData = Awaited<ReturnType<typeof getAdminMailbox>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailbox>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminMailbox>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminMailbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminMailbox<TData = Awaited<ReturnType<typeof getAdminMailbox>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the connected company mailbox
+ */
+
+export function useGetAdminMailbox<TData = Awaited<ReturnType<typeof getAdminMailbox>>, TError = ErrorType<void>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailbox>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdminMailboxQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getConnectAdminMailboxUrl = () => {
+
+
+
+
+  return `/api/admin/mailbox`
+}
+
+/**
+ * @summary Connect a Go45 IMAP and SMTP mailbox
+ */
+export const connectAdminMailbox = async (adminMailboxConnectInput: AdminMailboxConnectInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminMailbox> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AdminMailbox>(getConnectAdminMailboxUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminMailboxConnectInput)
+  }
+);}
+
+
+
+
+
+export const getConnectAdminMailboxMutationKey = () => ['connectAdminMailbox'] as const;
+
+export const getConnectAdminMailboxMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectAdminMailbox>>, TError,ConnectAdminMailboxMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof connectAdminMailbox>>, TError,ConnectAdminMailboxMutationVariables, TContext> => {
+
+const mutationKey = getConnectAdminMailboxMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof connectAdminMailbox>>, ConnectAdminMailboxMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  connectAdminMailbox(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConnectAdminMailboxMutationResult = NonNullable<Awaited<ReturnType<typeof connectAdminMailbox>>>
+    export type ConnectAdminMailboxMutationBody = BodyType<AdminMailboxConnectInput>
+    export type ConnectAdminMailboxMutationError = ErrorType<void>
+    export type ConnectAdminMailboxMutationVariables = {data: BodyType<AdminMailboxConnectInput>}
+
+    /**
+ * @summary Connect a Go45 IMAP and SMTP mailbox
+ */
+export const useConnectAdminMailbox = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectAdminMailbox>>, TError,ConnectAdminMailboxMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof connectAdminMailbox>>,
+        TError,
+        ConnectAdminMailboxMutationVariables,
+        TContext
+      > => {
+      return useMutation(getConnectAdminMailboxMutationOptions(options), queryClient);
+    }
+
+export const getDisconnectAdminMailboxUrl = () => {
+
+
+
+
+  return `/api/admin/mailbox`
+}
+
+/**
+ * @summary Disconnect the company mailbox
+ */
+export const disconnectAdminMailbox = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminMailboxDisconnectResponse> => {
+
+  return customFetch<AdminMailboxDisconnectResponse>(getDisconnectAdminMailboxUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDisconnectAdminMailboxMutationKey = () => ['disconnectAdminMailbox'] as const;
+
+export const getDisconnectAdminMailboxMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectAdminMailbox>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectAdminMailbox>>, TError,void, TContext> => {
+
+const mutationKey = getDisconnectAdminMailboxMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectAdminMailbox>>, void> = () => {
+
+
+          return  disconnectAdminMailbox(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectAdminMailboxMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectAdminMailbox>>>
+
+    export type DisconnectAdminMailboxMutationError = ErrorType<void>
+
+
+    /**
+ * @summary Disconnect the company mailbox
+ */
+export const useDisconnectAdminMailbox = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectAdminMailbox>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectAdminMailbox>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDisconnectAdminMailboxMutationOptions(options), queryClient);
+    }
+
+export const getListAdminMailboxMessagesUrl = (params?: ListAdminMailboxMessagesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/mailbox/messages?${stringifiedParams}` : `/api/admin/mailbox/messages`
+}
+
+/**
+ * @summary List recent inbox messages
+ */
+export const listAdminMailboxMessages = async (params?: ListAdminMailboxMessagesParams, options?: Parameters<typeof customFetch>[1]): Promise<AdminMailboxMessageList> => {
+
+  return customFetch<AdminMailboxMessageList>(getListAdminMailboxMessagesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminMailboxMessagesQueryKey = (params?: ListAdminMailboxMessagesParams,) => {
+    return [
+    `/api/admin/mailbox/messages`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListAdminMailboxMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError = ErrorType<void>>(params?: ListAdminMailboxMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminMailboxMessagesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminMailboxMessages>>> = ({ signal }) => listAdminMailboxMessages(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdminMailboxMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminMailboxMessages>>>
+export type ListAdminMailboxMessagesQueryError = ErrorType<void>
+
+
+export function useListAdminMailboxMessages<TData = Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError = ErrorType<void>>(
+ params: undefined |  ListAdminMailboxMessagesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminMailboxMessages>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminMailboxMessages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdminMailboxMessages<TData = Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError = ErrorType<void>>(
+ params?: ListAdminMailboxMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminMailboxMessages>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminMailboxMessages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdminMailboxMessages<TData = Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError = ErrorType<void>>(
+ params?: ListAdminMailboxMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List recent inbox messages
+ */
+
+export function useListAdminMailboxMessages<TData = Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError = ErrorType<void>>(
+ params?: ListAdminMailboxMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminMailboxMessages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdminMailboxMessagesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetAdminMailboxMessageUrl = (uid: number,) => {
+
+
+
+
+  return `/api/admin/mailbox/messages/${uid}`
+}
+
+/**
+ * @summary Read one inbox message
+ */
+export const getAdminMailboxMessage = async (uid: number, options?: Parameters<typeof customFetch>[1]): Promise<AdminMailboxMessageDetail> => {
+
+  return customFetch<AdminMailboxMessageDetail>(getGetAdminMailboxMessageUrl(uid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminMailboxMessageQueryKey = (uid: number,) => {
+    return [
+    `/api/admin/mailbox/messages/${uid}`
+    ] as const;
+    }
+
+
+export const getGetAdminMailboxMessageQueryOptions = <TData = Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError = ErrorType<void>>(uid: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminMailboxMessageQueryKey(uid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminMailboxMessage>>> = ({ signal }) => getAdminMailboxMessage(uid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uid !== null && uid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdminMailboxMessageQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminMailboxMessage>>>
+export type GetAdminMailboxMessageQueryError = ErrorType<void>
+
+
+export function useGetAdminMailboxMessage<TData = Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError = ErrorType<void>>(
+ uid: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminMailboxMessage>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminMailboxMessage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminMailboxMessage<TData = Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError = ErrorType<void>>(
+ uid: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminMailboxMessage>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminMailboxMessage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminMailboxMessage<TData = Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError = ErrorType<void>>(
+ uid: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Read one inbox message
+ */
+
+export function useGetAdminMailboxMessage<TData = Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError = ErrorType<void>>(
+ uid: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminMailboxMessage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdminMailboxMessageQueryOptions(uid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSendAdminMailboxMessageUrl = () => {
+
+
+
+
+  return `/api/admin/mailbox/send`
+}
+
+/**
+ * @summary Send or reply from the company mailbox
+ */
+export const sendAdminMailboxMessage = async (adminMailboxSendInput: AdminMailboxSendInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminMailboxSendResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AdminMailboxSendResponse>(getSendAdminMailboxMessageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminMailboxSendInput)
+  }
+);}
+
+
+
+
+
+export const getSendAdminMailboxMessageMutationKey = () => ['sendAdminMailboxMessage'] as const;
+
+export const getSendAdminMailboxMessageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendAdminMailboxMessage>>, TError,SendAdminMailboxMessageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendAdminMailboxMessage>>, TError,SendAdminMailboxMessageMutationVariables, TContext> => {
+
+const mutationKey = getSendAdminMailboxMessageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendAdminMailboxMessage>>, SendAdminMailboxMessageMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  sendAdminMailboxMessage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendAdminMailboxMessageMutationResult = NonNullable<Awaited<ReturnType<typeof sendAdminMailboxMessage>>>
+    export type SendAdminMailboxMessageMutationBody = BodyType<AdminMailboxSendInput>
+    export type SendAdminMailboxMessageMutationError = ErrorType<void>
+    export type SendAdminMailboxMessageMutationVariables = {data: BodyType<AdminMailboxSendInput>}
+
+    /**
+ * @summary Send or reply from the company mailbox
+ */
+export const useSendAdminMailboxMessage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendAdminMailboxMessage>>, TError,SendAdminMailboxMessageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof sendAdminMailboxMessage>>,
+        TError,
+        SendAdminMailboxMessageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSendAdminMailboxMessageMutationOptions(options), queryClient);
     }
 
