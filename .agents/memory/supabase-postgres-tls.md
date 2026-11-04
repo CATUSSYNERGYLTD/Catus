@@ -9,6 +9,10 @@ Supabase Postgres exposes a server root CA in Database settings. Use it with `ss
 
 **How to apply:** Prefer the CA from authenticated Supabase project settings. If the project owner explicitly directs continuing without it after the risk is explained, keep TLS encryption on, document the exception, and restore certificate verification when the CA becomes available.
 
+**Why:** A configured CA secret can still fail to validate the active database endpoint; secret presence alone does not prove it is the matching root certificate.
+
+**How to apply:** Before external database DDL, verify the endpoint with the configured CA. If certificate verification fails, stop before writing and obtain the matching CA from the authenticated project settings; never disable peer verification as a workaround.
+
 **Project exception:** On 2026-09-30, after the risk was explained, the owner directed proceeding with the Render deployment without requiring the Supabase root CA.
 
 **Why:** Deployment should proceed as directed, but without peer verification the database identity is not authenticated.
