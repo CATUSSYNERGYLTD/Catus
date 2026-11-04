@@ -3,3 +3,4 @@
 - [Supabase Postgres TLS](supabase-postgres-tls.md) — verify the database host with its Supabase root CA; encrypted TLS alone does not authenticate it.
 - [Render pnpm builds](render-pnpm.md) — use Render's installed `pnpm` directly; Corepack can fail when its system shim is read-only.
 - [GitHub push authentication](github-push-auth.md) — use Replit's standard Git credential flow after connecting GitHub; explicit PATs may authenticate as a different account.
+- [Render environment updates](render-env-vars.md) — Render's service env-var PUT replaces the full set; never send a partial list.
