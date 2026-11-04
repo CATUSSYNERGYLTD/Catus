@@ -11,11 +11,17 @@ Supabase Postgres exposes a server root CA in Database settings. Use it with `ss
 
 **Why:** A configured CA secret can still fail to validate the active database endpoint; secret presence alone does not prove it is the matching root certificate.
 
-**How to apply:** Before external database DDL, verify the endpoint with the configured CA. If certificate verification fails, stop before writing and obtain the matching CA from the authenticated project settings; never disable peer verification as a workaround.
+**How to apply:** Before external database DDL, verify the endpoint with the configured CA. If verification fails, obtain the matching CA unless the owner explicitly authorizes an unverified, encrypted one-off connection.
 
 **Why:** After the owner authorized a one-time encrypted connection without peer verification, the configured URI still failed at hostname resolution, showing that a present secret can also contain an unusable endpoint.
 
 **How to apply:** Treat DNS or pooler tenant errors as connection-URI issues, not TLS issues. Stop before DDL and correct the URI through the secure secrets flow instead of continuing to change TLS settings.
+
+**Development exception:** At the owner's request, the local API preview keeps TLS encryption but skips peer verification; production continues to verify the configured CA.
+
+**Why:** The supplied CA did not validate the endpoint, and the preview needed to use the corrected database URI.
+
+**How to apply:** Keep this exception development-only and restore verification in preview when the matching CA is available.
 
 **Project exception:** On 2026-09-30, after the risk was explained, the owner directed proceeding with the Render deployment without requiring the Supabase root CA.
 

@@ -7,6 +7,7 @@ const { Pool } = pg;
 const supabaseDatabaseUrl = process.env.SUPABASE_DATABASE_URL?.trim();
 const databaseUrl = supabaseDatabaseUrl || process.env.DATABASE_URL?.trim();
 const supabaseDatabaseCa = process.env.SUPABASE_DATABASE_CA_CERT?.trim();
+const isProduction = process.env.NODE_ENV === "production";
 
 if (!databaseUrl) {
   throw new Error(
@@ -18,12 +19,12 @@ export const pool = new Pool({
   connectionString: databaseUrl,
   ...(supabaseDatabaseUrl
     ? {
-        // Supabase CA was not supplied; keep TLS encryption while temporarily
-        // skipping peer verification. Configure SUPABASE_DATABASE_CA_CERT to
-        // restore certificate verification.
-        ssl: supabaseDatabaseCa
-          ? { ca: supabaseDatabaseCa, rejectUnauthorized: true }
-          : { rejectUnauthorized: false },
+        // Keep production certificate verification; the development preview
+        // temporarily skips peer verification while retaining TLS encryption.
+        ssl:
+          isProduction && supabaseDatabaseCa
+            ? { ca: supabaseDatabaseCa, rejectUnauthorized: true }
+            : { rejectUnauthorized: false },
       }
     : {}),
 });
