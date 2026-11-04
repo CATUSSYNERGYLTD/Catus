@@ -35,6 +35,26 @@ const loginWindowMs = 15 * 60 * 1000;
 const loginLimit = 5;
 const failedLoginAttempts = new Map<string, { count: number; resetAt: number }>();
 
+function getPostgresSqlState(error: unknown): string | undefined {
+  let current: unknown = error;
+
+  for (let depth = 0; depth < 5; depth += 1) {
+    if (typeof current !== "object" || current === null) return undefined;
+
+    const candidate = current as { code?: unknown; cause?: unknown };
+    if (
+      typeof candidate.code === "string" &&
+      /^[0-9A-Z]{5}$/.test(candidate.code)
+    ) {
+      return candidate.code;
+    }
+
+    current = candidate.cause;
+  }
+
+  return undefined;
+}
+
 function getClientKey(request: Request): string {
   return request.ip || request.socket.remoteAddress || "unknown";
 }
@@ -155,12 +175,22 @@ router.post(
   },
 );
 
-router.get("/site-content", async (_request, response): Promise<void> => {
-  const [saved] = await db
-    .select()
-    .from(siteContentTable)
-    .where(eq(siteContentTable.id, "main"))
-    .limit(1);
+router.get("/site-content", async (request, response): Promise<void> => {
+  let saved;
+  try {
+    [saved] = await db
+      .select()
+      .from(siteContentTable)
+      .where(eq(siteContentTable.id, "main"))
+      .limit(1);
+  } catch (error) {
+    request.log.error(
+      { dbErrorCode: getPostgresSqlState(error) ?? "unavailable" },
+      "Site content database read failed",
+    );
+    throw error;
+  }
+
   const result = GetSiteContentResponse.parse({
     content: saved?.content ?? null,
     updatedAt: saved?.updatedAt?.toISOString() ?? null,
